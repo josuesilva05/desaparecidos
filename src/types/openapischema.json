@@ -1,0 +1,1976 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "ABITUS API REST",
+    "description": "ABITUS API REST - Módulo Operacional",
+    "termsOfService": "Terms of Service",
+    "contact": {
+      "name": "Polícia Judiciária Civil do Estado de Mato Grosso",
+      "url": "https://geia.pjc.mt.gov.br"
+    },
+    "license": {
+      "name": "Licensa de uso privado da Polícia Judiciária Civil MT",
+      "url": "https://geia.pjc.mt.gov.br"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://abitus-api.geia.vip",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "Authorization": [
+        "Authorization"
+      ]
+    }
+  ],
+  "paths": {
+    "/v1/refresh-token": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Atualiza o token JWT",
+        "operationId": "refreshToken",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Usuário não autorizado/Token expirado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permissao"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ocorrencias/informacoes-desaparecido": {
+      "get": {
+        "tags": [
+          "ocorrencia-resource"
+        ],
+        "description": "Endpoint de listagem de informações a respeito do desaparecido",
+        "operationId": "buscarInformacoes",
+        "parameters": [
+          {
+            "name": "ocorrenciaId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "uniqueItems": true,
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OcorrenciaInformacaoDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ocorrencia-resource"
+        ],
+        "description": "Endpoint que permite adicionar informações a respeito do desaparecido",
+        "operationId": "adicionarInformacoes",
+        "parameters": [
+          {
+            "name": "informacao",
+            "in": "query",
+            "description": "Informações a respeito da visualização da Pessoa",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Foi vista em cuiabá na rua abc, número 123,  utilizando saia rosa"
+          },
+          {
+            "name": "descricao",
+            "in": "query",
+            "description": "Descrição do Anexo",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Foto João da Silva"
+          },
+          {
+            "name": "data",
+            "in": "query",
+            "description": "Data da visualização da Pessoa yyyy-MM-dd",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-01-20"
+          },
+          {
+            "name": "ocoId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": "Not Found: Ocorrência não encontrada!",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OcorrenciaInformacaoDTO"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OcorrenciaInformacaoDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ocorrencias/delegacia-digital": {
+      "post": {
+        "tags": [
+          "ocorrencia-resource"
+        ],
+        "operationId": "adicionarOcorrenciaIntegracao",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OcorrenciaIntegracaoDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ocorrencias/delegacia-digital/verificar-duplicidade": {
+      "post": {
+        "tags": [
+          "ocorrencia-resource"
+        ],
+        "operationId": "checarVitimaDuplicada",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VitimaChecagemDuplicidadeResquestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/login": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Realiza a autenticação na api",
+        "description": "No body 'accessToken' é retornado o token JWT e 'refreshToken' o refresh token",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permissao"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/pessoas/{id}": {
+      "get": {
+        "tags": [
+          "pessoa-resource"
+        ],
+        "description": "Retorna detalhes de uma pessoa desaparecida por id",
+        "operationId": "detalhaPessoaDesaparecida",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Pessoa encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PessoaDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found: Não foi encontrada pessoa com o {id}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PessoaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/pessoas/aberto": {
+      "get": {
+        "tags": [
+          "pessoa-resource"
+        ],
+        "description": "Retorna uma pagina de pessoas (DESAPARECIDO ou LOCALIZADO) em ordem decrescente, ",
+        "operationId": "listaUltimasPessoasDesaparecidas",
+        "parameters": [
+          {
+            "name": "pagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "porPagina",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "direcao",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "DESC"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "DESAPARECIDO"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found: Nenhum resultado encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagePessoaDTO"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK: sucesso",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagePessoaDTO"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/v1/pessoas/aberto/filtro": {
+      "get": {
+        "tags": [
+          "pessoa-resource"
+        ],
+        "description": "Retorna uma lista de pessoas desaparecidas de acordo com o filtro (nome, faixa etaria, sexo)",
+        "operationId": "listaPessoasDesaparecidasPeloFiltro",
+        "parameters": [
+          {
+            "name": "nome",
+            "in": "query",
+            "description": "Nome do Pessoa",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            },
+            "example": "joao"
+          },
+          {
+            "name": "faixaIdadeInicial",
+            "in": "query",
+            "description": "Faixa Etaria Inicial",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "faixaIdadeFinal",
+            "in": "query",
+            "description": "Faixa Etaria Final",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "sexo",
+            "in": "query",
+            "description": "Sexo MASCULINO ou FEMININO",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            },
+            "examples": {
+              "MASCULINO": {
+                "description": "MASCULINO"
+              },
+              "FEMININO": {
+                "description": "FEMININO"
+              }
+            }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "description": "Pagina",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "porPagina",
+            "in": "query",
+            "description": "Por Pagina",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "example": 10
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Status DESAPARECIDO ou LOCALIZADO",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            },
+            "examples": {
+              "DESAPARECIDO": {
+                "description": "DESAPARECIDO"
+              },
+              "LOCALIZADO": {
+                "description": "LOCALIZADO"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found: Nenhum resultado encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagePessoaDTO"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK: sucesso",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagePessoaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/pessoas/aberto/estatistico": {
+      "get": {
+        "tags": [
+          "pessoa-resource"
+        ],
+        "description": "Retorna a quantidade de pessoas desaparecidas e encontradas",
+        "operationId": "quantidadePessoasDesaparecidasLocalizadas",
+        "responses": {
+          "404": {
+            "description": "Not Found: Nenhum resultado encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstatisticaPessoaDTO"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK: sucesso",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstatisticaPessoaDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/pessoas/aberto/dinamico": {
+      "get": {
+        "tags": [
+          "pessoa-resource"
+        ],
+        "description": "Endpoint de busca de desaparecidos que tenha fotos de forma randômica",
+        "operationId": "pessoasDesaparecidasRandomico",
+        "parameters": [
+          {
+            "name": "registros",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 4
+            },
+            "example": 4
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found: Nenhum resultado encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PessoaDTO"
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK: sucesso",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PessoaDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ocorrencias/motivos": {
+      "get": {
+        "tags": [
+          "ocorrencia-resource"
+        ],
+        "operationId": "listarMotivosDesaparecimento",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MotivoDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Permissao": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "OcorrenciaInformacaoDTO": {
+        "required": [
+          "data",
+          "informacao",
+          "ocoId"
+        ],
+        "type": "object",
+        "properties": {
+          "ocoId": {
+            "type": "integer",
+            "description": "Id da ocorrência",
+            "format": "int64"
+          },
+          "informacao": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string",
+            "description": "Data de visualização da Pessoa",
+            "format": "date",
+            "example": "2022-01-28"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "anexos": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "EnderecoDto": {
+        "type": "object",
+        "properties": {
+          "tipoLogradouro": {
+            "type": "string",
+            "description": "Tipo de logradouro, por exemplo: RUA, AVENIDA",
+            "enum": [
+              "ALAMEDA",
+              "ALTO",
+              "AVENIDA",
+              "BECO",
+              "CALCADAO",
+              "CAMINHO",
+              "ESCADARIA",
+              "ESTRADA",
+              "LADEIRA",
+              "LINHA",
+              "PARALELA",
+              "PRACA",
+              "QUADRA",
+              "RUA",
+              "RODOVIA",
+              "SUBIDA",
+              "TRAVESSA",
+              "VIA",
+              "VIELA",
+              "OUTROS"
+            ]
+          },
+          "logradouro": {
+            "type": "string",
+            "description": "Nome do logradouro",
+            "example": "Rua das Flores"
+          },
+          "numero": {
+            "type": "string",
+            "description": "Número do endereço",
+            "example": "123"
+          },
+          "complemento": {
+            "type": "string",
+            "description": "Complemento do endereço",
+            "example": "Apartamento 304"
+          },
+          "bairro": {
+            "type": "string",
+            "description": "Bairro onde o endereço se localiza",
+            "example": "Jardim das Acácias"
+          },
+          "cidadeId": {
+            "type": "integer",
+            "description": "ID da cidade",
+            "format": "int64",
+            "example": 3
+          },
+          "uf": {
+            "type": "string",
+            "description": "UF (Estado) do endereço",
+            "example": "SP",
+            "enum": [
+              "MT",
+              "AC",
+              "AL",
+              "AP",
+              "AM",
+              "BA",
+              "CE",
+              "DF",
+              "ES",
+              "GO",
+              "MA",
+              "MS",
+              "MG",
+              "PA",
+              "PB",
+              "PR",
+              "PE",
+              "PI",
+              "RJ",
+              "RN",
+              "RS",
+              "RO",
+              "RR",
+              "SC",
+              "SP",
+              "SE",
+              "TO"
+            ]
+          },
+          "referencia": {
+            "type": "string",
+            "description": "Ponto de referência do endereço",
+            "example": "Próximo ao supermercado XYZ"
+          },
+          "latitude": {
+            "type": "number",
+            "description": "Latitude geográfica do endereço",
+            "format": "double",
+            "example": -23.5645
+          },
+          "longitude": {
+            "type": "number",
+            "description": "Longitude geográfica do endereço",
+            "format": "double",
+            "example": -46.6543
+          },
+          "cep": {
+            "type": "string",
+            "description": "CEP do endereço",
+            "example": "01234-567"
+          },
+          "tipoEndereco": {
+            "type": "string",
+            "description": "Tipo de endereço, por exemplo: RESIDENCIAL, COMERCIAL",
+            "enum": [
+              "RESIDENCIAL",
+              "COMERCIAL",
+              "OUTROS"
+            ]
+          }
+        }
+      },
+      "EnderecoEletronicoDto": {
+        "required": [
+          "endereco"
+        ],
+        "type": "object",
+        "properties": {
+          "endereco": {
+            "type": "string",
+            "description": "Endereço do endereço eletrônico",
+            "example": "pjc@pjc.mt.gov.br"
+          },
+          "principal": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FotoPessoaDto": {
+        "type": "object",
+        "properties": {
+          "descricao": {
+            "type": "string",
+            "description": "Descrição da foto",
+            "example": "Foto do aniversário"
+          },
+          "tamanho": {
+            "type": "integer",
+            "description": "Tamanho do arquivo da foto em KB",
+            "format": "int32",
+            "example": 500
+          },
+          "tipo": {
+            "type": "string",
+            "description": "Tipo da foto (por exemplo, 'jpg', 'png')",
+            "example": "image/jpeg"
+          },
+          "data": {
+            "type": "string",
+            "description": "Data de upload da foto",
+            "format": "date",
+            "example": "2025-02-11"
+          },
+          "principal": {
+            "type": "boolean",
+            "description": "Indica se a foto é principal",
+            "example": true
+          },
+          "hash": {
+            "type": "string",
+            "description": "Hash único da foto",
+            "example": "3f96ad2b10594470833957b77ff420fedc794ef89d51c9bdef0e321bc301c0fc-1621948089453.jpg"
+          },
+          "bucket": {
+            "type": "string",
+            "description": "Nome do bucket onde a foto está armazenada",
+            "example": "abitus.foto-pessoa"
+          }
+        }
+      },
+      "OcorrenciaContatoDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome completo do contato",
+            "example": "João da Silva"
+          },
+          "telefone": {
+            "type": "string",
+            "description": "Telefone de contato",
+            "example": "(66)99989-5703"
+          },
+          "grauParentesco": {
+            "type": "string",
+            "description": "Grau de parentesco do contato",
+            "example": "NETO_NETA",
+            "enum": [
+              "AMIGO_AMIGA",
+              "AVOS",
+              "BISAVOS",
+              "BISNETO_BISNETA",
+              "CONJUGE",
+              "FILHO_FILHA",
+              "GENRO_NORA",
+              "IRMA_IRMAO",
+              "NENHUM",
+              "NETO_NETA",
+              "PAI_MAE",
+              "PADRASTO_MADRASTA",
+              "PRIMO_PRIMA",
+              "TIO_TIA",
+              "TIOAVOS",
+              "TRISAVOS",
+              "TRINETO_TRINETA",
+              "SOBRINHO_SOBRINHA",
+              "SOBRINHO_NETOS",
+              "SOGRO_SOGRA"
+            ]
+          }
+        },
+        "description": "Lista de contatos relacionados à ocorrência"
+      },
+      "OcorrenciaEntrevistaComportamentalDto": {
+        "type": "object",
+        "properties": {
+          "relacionamento": {
+            "type": "string",
+            "description": "Descrição do relacionamento da pessoa",
+            "example": "Possui boa relação com a família e amigos"
+          },
+          "dividas": {
+            "type": "string",
+            "description": "Descrição de dívidas da pessoa",
+            "example": "Dívidas de consumo e empréstimos pessoais"
+          },
+          "vicios": {
+            "type": "string",
+            "description": "Descrição dos vícios da pessoa",
+            "example": "Álcool e tabaco"
+          },
+          "tipoDroga": {
+            "type": "string",
+            "description": "Tipo de droga que a pessoa consome",
+            "example": "Cocaína"
+          },
+          "situacaoRua": {
+            "type": "boolean",
+            "description": "Indica se a pessoa está em situação de rua",
+            "example": false
+          },
+          "desafetos": {
+            "type": "string",
+            "description": "Descrição de desafetos da pessoa",
+            "example": "Conflitos com ex-companheiro e vizinhos"
+          },
+          "desapareceuAntes": {
+            "type": "string",
+            "description": "Caso tenha desaparecido antes, descrição do evento",
+            "example": "Desapareceu por 3 dias em 2022"
+          },
+          "melhorAmigo": {
+            "type": "string",
+            "description": "Nome do melhor amigo da pessoa",
+            "example": "Carlos Pereira"
+          },
+          "faccao": {
+            "type": "string",
+            "description": "Facção com a qual a pessoa tem envolvimento",
+            "example": "Nenhum envolvimento com facções"
+          },
+          "observacao": {
+            "type": "string",
+            "description": "Observações adicionais sobre a pessoa",
+            "example": "Pessoa com histórico de violência doméstica"
+          },
+          "depressaoAnsiedadeOutrosProblemasMentais": {
+            "type": "boolean"
+          },
+          "comportamentoAutoDestrutivo": {
+            "type": "boolean"
+          },
+          "desentendimentoRecente": {
+            "type": "boolean"
+          },
+          "terminoRelacionamentoRecente": {
+            "type": "boolean"
+          },
+          "mudancaHumor": {
+            "type": "boolean"
+          },
+          "eventoMarcante": {
+            "type": "boolean"
+          }
+        },
+        "description": "Lista de entrevistas comportamentais realizadas"
+      },
+      "OcorrenciaEntrevistaDesaparecimentoDto": {
+        "type": "object",
+        "properties": {
+          "vestimenta": {
+            "type": "string",
+            "description": "Descrição da vestimenta da pessoa desaparecida",
+            "example": "Camisa branca e jeans"
+          },
+          "aderecos": {
+            "type": "string",
+            "description": "Descrição dos adereços usados pela pessoa desaparecida",
+            "example": "Óculos escuros e relógio de pulso"
+          },
+          "roupa": {
+            "type": "string",
+            "description": "Descrição da roupa usada pela pessoa desaparecida",
+            "example": "Camiseta preta e calça jeans"
+          },
+          "sapatos": {
+            "type": "string",
+            "description": "Descrição dos sapatos usados pela pessoa desaparecida",
+            "example": "Tênis branco"
+          },
+          "acessorios": {
+            "type": "string",
+            "description": "Descrição de acessórios usados pela pessoa desaparecida",
+            "example": "Pulseira dourada e anel"
+          },
+          "meioTransporte": {
+            "type": "string",
+            "description": "Meio de transporte utilizado pela pessoa no momento do desaparecimento",
+            "example": "Carro vermelho"
+          },
+          "informacao": {
+            "type": "string",
+            "description": "Informações adicionais sobre o desaparecimento",
+            "example": "A pessoa foi vista pela última vez em frente à sua casa."
+          },
+          "ondeFoiVistoUltimaVez": {
+            "type": "string",
+            "description": "Último local onde a pessoa foi vista",
+            "example": "Praça Central, próximo à fonte"
+          },
+          "oqueEstavaFazendo": {
+            "type": "string",
+            "description": "O que a pessoa estava fazendo no momento em que foi vista",
+            "example": "Falando ao telefone e olhando em volta"
+          },
+          "comQuemEstava": {
+            "type": "string",
+            "description": "Com quem a pessoa estava no momento",
+            "example": "Um homem de boné azul e camiseta preta"
+          },
+          "incomumOuSuspeito": {
+            "type": "string",
+            "description": "Alguma situação incomum ou suspeita observada",
+            "example": "Parecia nervoso e olhava frequentemente para trás"
+          },
+          "clima": {
+            "type": "string",
+            "description": "Condição climática no momento da observação",
+            "example": "Nublado com chuviscos leves"
+          },
+          "particularidadeLocal": {
+            "type": "string",
+            "description": "Alguma particularidade do local onde foi visto",
+            "example": "Havia uma feira acontecendo no local e muitas pessoas circulando"
+          }
+        },
+        "description": "Lista de entrevistas de desaparecimento"
+      },
+      "OcorrenciaIntegracaoDto": {
+        "required": [
+          "cargoUsuarioCadastro",
+          "comunicante",
+          "nomeUsuarioCadastro",
+          "usuarioCadastroId",
+          "vitima"
+        ],
+        "type": "object",
+        "properties": {
+          "protocolo": {
+            "type": "string"
+          },
+          "numAip": {
+            "type": "string",
+            "description": "Número do AIP da ocorrência",
+            "example": "12345"
+          },
+          "numIp": {
+            "type": "string",
+            "description": "Número do IP da ocorrência",
+            "example": "67890"
+          },
+          "enderecos": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Lista de endereços relacionados à ocorrência",
+            "items": {
+              "$ref": "#/components/schemas/EnderecoDto"
+            }
+          },
+          "vitima": {
+            "$ref": "#/components/schemas/PessoaDto"
+          },
+          "vitimaFotos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FotoPessoaDto"
+            }
+          },
+          "unidadeId": {
+            "type": "integer",
+            "description": "ID da unidade responsável pela ocorrência",
+            "format": "int64",
+            "example": 1
+          },
+          "usuarioCadastroId": {
+            "type": "integer",
+            "description": "ID do usuário responsável pelo cadastro da ocorrência",
+            "format": "int64",
+            "example": 100
+          },
+          "boNumero": {
+            "type": "string",
+            "description": "Número do Boletim de Ocorrência",
+            "example": "2024.561"
+          },
+          "origemBO": {
+            "type": "string",
+            "description": "Origem do Boletim de Ocorrência",
+            "enum": [
+              "PM",
+              "PJC",
+              "PJC_MINHA_UNIDADE",
+              "GUARDA_MUNICIPAL",
+              "POLICIA_FEDERAL",
+              "POLICIA_RODOVIARIA_FEDERAL",
+              "OUTROS"
+            ]
+          },
+          "codBO": {
+            "type": "integer",
+            "description": "Código do Boletim de Ocorrência",
+            "format": "int64",
+            "example": 10001
+          },
+          "dataHoraFato": {
+            "type": "string",
+            "description": "Data e hora do fato",
+            "format": "date-time"
+          },
+          "altura": {
+            "type": "string",
+            "description": "Altura da vítima",
+            "enum": [
+              "MB",
+              "B",
+              "M",
+              "A",
+              "MA"
+            ]
+          },
+          "compleicao": {
+            "type": "string",
+            "description": "Complexão física da vítima",
+            "enum": [
+              "MAGRO",
+              "GORDO",
+              "FORTE",
+              "ESBELTO"
+            ]
+          },
+          "cabeloCor": {
+            "type": "string",
+            "description": "Cor do cabelo da vítima",
+            "enum": [
+              "BRANCOS",
+              "CASTANHOS",
+              "COLORIDOS",
+              "GRISALHOS",
+              "LOUROS",
+              "PRETOS",
+              "RUIVOS",
+              "OUTRO"
+            ]
+          },
+          "cabeloTipo": {
+            "type": "string",
+            "description": "Tipo de cabelo da vítima",
+            "enum": [
+              "CALVO",
+              "CARAPINHA",
+              "CARECA",
+              "ENCARACOLADO",
+              "LISO",
+              "ONDULADO",
+              "RASPADO",
+              "OUTRO"
+            ]
+          },
+          "olhoTipo": {
+            "type": "string",
+            "description": "Tipo de olho da vítima",
+            "enum": [
+              "NORMAL",
+              "ORIENTAL",
+              "SALIENTE",
+              "CAOLHO",
+              "ESTRABICO",
+              "PROTESE",
+              "OUTRO"
+            ]
+          },
+          "olhoCor": {
+            "type": "string",
+            "description": "Cor dos olhos da vítima",
+            "enum": [
+              "PRETOS",
+              "CASTANHOS",
+              "VERDES",
+              "AZUIS",
+              "HETEROCROMIA",
+              "OUTRO"
+            ]
+          },
+          "fratura": {
+            "type": "string",
+            "description": "Fratura identificada na vítima",
+            "example": "Fratura no braço esquerdo"
+          },
+          "placaMetalica": {
+            "type": "string",
+            "description": "Placa metálica na vítima",
+            "example": "Placa no joelho esquerdo"
+          },
+          "tatuagem": {
+            "type": "string",
+            "description": "Tatuagens da vítima",
+            "example": "Tatuagem de leão no braço direito"
+          },
+          "cicatriz": {
+            "type": "string",
+            "description": "Cicatrizes da vítima",
+            "example": "Cicatriz no rosto devido a acidente"
+          },
+          "arcadaDentaria": {
+            "type": "string",
+            "description": "Arcada dentária da vítima",
+            "example": "Arcada dentária completa"
+          },
+          "aparelhoDentario": {
+            "type": "boolean",
+            "description": "Indica se a vítima possui aparelho dentário",
+            "example": false
+          },
+          "defeitoFisico": {
+            "type": "string",
+            "description": "Defeito físico da vítima",
+            "example": "Defeito na perna esquerda"
+          },
+          "deficienciaFisica": {
+            "type": "string",
+            "description": "Deficiência física da vítima",
+            "example": "Deficiência auditiva"
+          },
+          "deficienciaMental": {
+            "type": "string",
+            "description": "Deficiência mental da vítima",
+            "example": "Transtorno bipolar"
+          },
+          "deficienciaMentalCuratela": {
+            "type": "boolean",
+            "description": "Indica se a vítima possui curatela devido a deficiência mental",
+            "example": false
+          },
+          "deficienciaMentalLaudo": {
+            "type": "boolean",
+            "description": "Indica se a vítima possui laudo para deficiência mental",
+            "example": false
+          },
+          "deficienciaMentalInterdicao": {
+            "type": "boolean",
+            "description": "Indica se a vítima tem interdição devido à deficiência mental",
+            "example": false
+          },
+          "doencaTransmissivelIncuravel": {
+            "type": "string",
+            "description": "Doença transmissível incurável da vítima",
+            "example": "HIV/AIDS"
+          },
+          "gravidez": {
+            "type": "boolean",
+            "description": "Indica se a vítima está grávida",
+            "example": false
+          },
+          "cegueira": {
+            "type": "boolean",
+            "description": "Indica se a vítima é cega",
+            "example": false
+          },
+          "faccao": {
+            "type": "boolean",
+            "description": "Indica se a vítima está envolvida com facção",
+            "example": false
+          },
+          "faccaoNome": {
+            "type": "string",
+            "description": "Nome da facção, se houver",
+            "enum": [
+              "PCC",
+              "CV",
+              "OUTROS"
+            ]
+          },
+          "grupoSanguineo": {
+            "type": "string",
+            "description": "Grupo sanguíneo da vítima",
+            "enum": [
+              "A",
+              "B",
+              "AB",
+              "O"
+            ]
+          },
+          "fatorRh": {
+            "type": "string",
+            "description": "Fator RH da vítima",
+            "enum": [
+              "POSITIVO",
+              "NEGATIVO"
+            ]
+          },
+          "contatos": {
+            "type": "array",
+            "description": "Lista de contatos relacionados à ocorrência",
+            "items": {
+              "$ref": "#/components/schemas/OcorrenciaContatoDto"
+            }
+          },
+          "entrevistaComportamental": {
+            "$ref": "#/components/schemas/OcorrenciaEntrevistaComportamentalDto"
+          },
+          "entrevistaDesaparecimento": {
+            "$ref": "#/components/schemas/OcorrenciaEntrevistaDesaparecimentoDto"
+          },
+          "grauParentescoComunicante": {
+            "type": "string",
+            "description": "Grau de parentesco do comunicante",
+            "enum": [
+              "AMIGO_AMIGA",
+              "AVOS",
+              "BISAVOS",
+              "BISNETO_BISNETA",
+              "CONJUGE",
+              "FILHO_FILHA",
+              "GENRO_NORA",
+              "IRMA_IRMAO",
+              "NENHUM",
+              "NETO_NETA",
+              "PAI_MAE",
+              "PADRASTO_MADRASTA",
+              "PRIMO_PRIMA",
+              "TIO_TIA",
+              "TIOAVOS",
+              "TRISAVOS",
+              "TRINETO_TRINETA",
+              "SOBRINHO_SOBRINHA",
+              "SOBRINHO_NETOS",
+              "SOGRO_SOGRA"
+            ]
+          },
+          "grauParentescoLocalizacao": {
+            "type": "string",
+            "description": "Grau de parentesco para localização da vítima",
+            "enum": [
+              "AMIGO_AMIGA",
+              "AVOS",
+              "BISAVOS",
+              "BISNETO_BISNETA",
+              "CONJUGE",
+              "FILHO_FILHA",
+              "GENRO_NORA",
+              "IRMA_IRMAO",
+              "NENHUM",
+              "NETO_NETA",
+              "PAI_MAE",
+              "PADRASTO_MADRASTA",
+              "PRIMO_PRIMA",
+              "TIO_TIA",
+              "TIOAVOS",
+              "TRISAVOS",
+              "TRINETO_TRINETA",
+              "SOBRINHO_SOBRINHA",
+              "SOBRINHO_NETOS",
+              "SOGRO_SOGRA"
+            ]
+          },
+          "telefoneLocalizacao": {
+            "type": "string",
+            "description": "Telefone de localização da vítima",
+            "example": "123456789"
+          },
+          "condicaoLocalizacao": {
+            "type": "string",
+            "description": "Condição de localização da vítima",
+            "example": "Em estado grave"
+          },
+          "encontradoVivo": {
+            "type": "boolean",
+            "description": "Indica se a vítima foi encontrada viva",
+            "example": true
+          },
+          "sigiloso": {
+            "type": "boolean",
+            "description": "Indica se a ocorrência é sigilosa",
+            "example": false
+          },
+          "grauParentescoPessoaTermo": {
+            "type": "string",
+            "description": "Grau de parentesco da pessoa no termo de ocorrência",
+            "enum": [
+              "AMIGO_AMIGA",
+              "AVOS",
+              "BISAVOS",
+              "BISNETO_BISNETA",
+              "CONJUGE",
+              "FILHO_FILHA",
+              "GENRO_NORA",
+              "IRMA_IRMAO",
+              "NENHUM",
+              "NETO_NETA",
+              "PAI_MAE",
+              "PADRASTO_MADRASTA",
+              "PRIMO_PRIMA",
+              "TIO_TIA",
+              "TIOAVOS",
+              "TRISAVOS",
+              "TRINETO_TRINETA",
+              "SOBRINHO_SOBRINHA",
+              "SOBRINHO_NETOS",
+              "SOGRO_SOGRA"
+            ]
+          },
+          "informacaoMorte": {
+            "type": "boolean",
+            "description": "Indica se a vítima tem informações sobre a morte",
+            "example": false
+          },
+          "informacaoMorteBoNumero": {
+            "type": "string",
+            "description": "Número do BO relacionado à informação de morte",
+            "example": "BO987654"
+          },
+          "nomeUsuarioCadastro": {
+            "type": "string",
+            "description": "Nome do usuário de cadastro",
+            "example": "LIDIA GARCIA DE FARIA"
+          },
+          "cargoUsuarioCadastro": {
+            "type": "string",
+            "description": "Cargo do usuário de cadastro",
+            "example": "ESCRIVAO"
+          },
+          "comunicante": {
+            "$ref": "#/components/schemas/PessoaDto"
+          },
+          "redesSociaisVitima": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RedeSocialDto"
+            }
+          }
+        }
+      },
+      "PessoaDto": {
+        "required": [
+          "nome"
+        ],
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome completo da pessoa",
+            "example": "João da Silva"
+          },
+          "nomeSocial": {
+            "type": "string",
+            "description": "Nome social da pessoa, se aplicável",
+            "example": "Joãozinho"
+          },
+          "razaoSocial": {
+            "type": "string",
+            "description": "Razão social da pessoa jurídica",
+            "example": "João da Silva Ltda."
+          },
+          "mae": {
+            "type": "string",
+            "description": "Nome da mãe da pessoa",
+            "example": "Maria da Silva"
+          },
+          "pai": {
+            "type": "string",
+            "description": "Nome do pai da pessoa",
+            "example": "Carlos da Silva"
+          },
+          "dtNascimento": {
+            "type": "string",
+            "description": "Data de nascimento da pessoa",
+            "format": "date",
+            "example": "1990-05-15"
+          },
+          "naturalidadeId": {
+            "type": "integer",
+            "description": "ID da naturalidade da pessoa",
+            "format": "int64",
+            "example": 1
+          },
+          "sexo": {
+            "type": "string",
+            "description": "Sexo da pessoa",
+            "example": "MASCULINO",
+            "enum": [
+              "MASCULINO",
+              "FEMININO"
+            ]
+          },
+          "orientacaoSexual": {
+            "type": "string",
+            "description": "Orientação sexual da pessoa",
+            "example": "HETEROSEXUAL",
+            "enum": [
+              "HETEROSEXUAL",
+              "HOMOSEXUAL",
+              "BISEXUAL"
+            ]
+          },
+          "identidadeGenero": {
+            "type": "string",
+            "description": "Identidade de gênero da pessoa",
+            "enum": [
+              "TRANSEXUAL",
+              "TRAVESTI"
+            ]
+          },
+          "escolaridade": {
+            "type": "string",
+            "description": "Escolaridade da pessoa",
+            "example": "SUPERIOR",
+            "enum": [
+              "ANALFABETO",
+              "ALFABETIZADO",
+              "FUNDAMENTAL",
+              "MEDIO",
+              "SUPERIOR",
+              "POSGRADUADO"
+            ]
+          },
+          "estadoCivil": {
+            "type": "string",
+            "description": "Estado civil da pessoa",
+            "example": "SOLTEIRO",
+            "enum": [
+              "CASADO",
+              "CONVIVENTE",
+              "DIVORCIADO",
+              "SEPARADO",
+              "SOLTEIRO",
+              "VIUVO"
+            ]
+          },
+          "cutis": {
+            "type": "string",
+            "description": "Tipo de pele (cútis) da pessoa",
+            "example": "INDIGENA",
+            "enum": [
+              "AMARELA",
+              "BRANCA",
+              "INDIGENA",
+              "PARDA",
+              "PRETA"
+            ]
+          },
+          "funcaoPublica": {
+            "type": "string",
+            "description": "Função pública da pessoa, se aplicável",
+            "example": "Professor"
+          },
+          "nacionalidadeId": {
+            "type": "integer",
+            "description": "ID da nacionalidade da pessoa",
+            "format": "int64",
+            "example": 1058
+          },
+          "cpfCnpj": {
+            "type": "integer",
+            "description": "CPF ou CNPJ da pessoa",
+            "format": "int64",
+            "example": 12345678901
+          },
+          "rgNumero": {
+            "type": "string",
+            "description": "Número do RG da pessoa",
+            "example": "MG1234567"
+          },
+          "rgEmissor": {
+            "type": "string",
+            "description": "Emissor do RG",
+            "example": "SSP-MG"
+          },
+          "rgUF": {
+            "type": "string",
+            "description": "UF do emissor do RG",
+            "example": "MT",
+            "enum": [
+              "MT",
+              "AC",
+              "AL",
+              "AP",
+              "AM",
+              "BA",
+              "CE",
+              "DF",
+              "ES",
+              "GO",
+              "MA",
+              "MS",
+              "MG",
+              "PA",
+              "PB",
+              "PR",
+              "PE",
+              "PI",
+              "RJ",
+              "RN",
+              "RS",
+              "RO",
+              "RR",
+              "SC",
+              "SP",
+              "SE",
+              "TO"
+            ]
+          },
+          "tipoPessoa": {
+            "type": "string",
+            "description": "Tipo de pessoa (Física ou Jurídica)",
+            "example": "FISICA",
+            "enum": [
+              "FISICA",
+              "JURIDICA"
+            ]
+          },
+          "profissao": {
+            "type": "string",
+            "description": "Profissão da pessoa",
+            "example": "Engenheiro"
+          },
+          "restrito": {
+            "type": "boolean",
+            "description": "Indica se a pessoa é restrita em algum contexto",
+            "example": false
+          },
+          "dtFalecimento": {
+            "type": "string",
+            "description": "Data de falecimento da pessoa, se aplicável",
+            "format": "date",
+            "example": "2025-01-01"
+          },
+          "vivo": {
+            "type": "boolean",
+            "description": "Indica se a pessoa está viva",
+            "example": true
+          },
+          "telefones": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TelefoneDto"
+            }
+          },
+          "emails": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EnderecoEletronicoDto"
+            }
+          },
+          "enderecos": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EnderecoDto"
+            }
+          }
+        }
+      },
+      "RedeSocialDto": {
+        "type": "object",
+        "properties": {
+          "tipoRedeSocial": {
+            "type": "string",
+            "enum": [
+              "INSTA",
+              "FACE",
+              "LINKEDIN",
+              "TWITTER",
+              "OUTROS"
+            ]
+          },
+          "url": {
+            "maxLength": 250,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "TelefoneDto": {
+        "required": [
+          "numero",
+          "tipoTelefone"
+        ],
+        "type": "object",
+        "properties": {
+          "numero": {
+            "type": "string",
+            "description": "Número do telefone",
+            "example": "66998451236"
+          },
+          "tipoTelefone": {
+            "type": "string",
+            "enum": [
+              "CELULAR",
+              "RESIDENCIAL",
+              "COMERCIAL",
+              "FAX",
+              "OUTROS"
+            ]
+          }
+        }
+      },
+      "VitimaChecagemDuplicidadeResquestDto": {
+        "required": [
+          "dataDesaparecimento",
+          "nome"
+        ],
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "LORENA VITÓRIA DA SILVA SANTOS"
+          },
+          "mae": {
+            "type": "string"
+          },
+          "cpf": {
+            "type": "string",
+            "example": "11357792107"
+          },
+          "dataNascimento": {
+            "type": "string",
+            "format": "date",
+            "example": "2011-10-17"
+          },
+          "dataDesaparecimento": {
+            "type": "string",
+            "format": "date",
+            "example": "2025-01-13"
+          }
+        }
+      },
+      "LoginDTO": {
+        "required": [
+          "login",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "login": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "OcorrenciaCartazDTO": {
+        "type": "object",
+        "properties": {
+          "urlCartaz": {
+            "type": "string"
+          },
+          "tipoCartaz": {
+            "type": "string",
+            "enum": [
+              "PDF_DESAPARECIDO",
+              "PDF_LOCALIZADO",
+              "JPG_DESAPARECIDO",
+              "JPG_LOCALIZADO",
+              "INSTA_DESAPARECIDO",
+              "INSTA_LOCALIZADO"
+            ]
+          }
+        }
+      },
+      "OcorrenciaDTO": {
+        "type": "object",
+        "properties": {
+          "dtDesaparecimento": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dataLocalizacao": {
+            "type": "string",
+            "format": "date"
+          },
+          "encontradoVivo": {
+            "type": "boolean"
+          },
+          "localDesaparecimentoConcat": {
+            "type": "string"
+          },
+          "ocorrenciaEntrevDesapDTO": {
+            "$ref": "#/components/schemas/OcorrenciaEntrevDesapDTO"
+          },
+          "listaCartaz": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OcorrenciaCartazDTO"
+            }
+          },
+          "ocoId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "OcorrenciaEntrevDesapDTO": {
+        "type": "object",
+        "properties": {
+          "informacao": {
+            "type": "string"
+          },
+          "vestimentasDesaparecido": {
+            "type": "string"
+          }
+        }
+      },
+      "PessoaDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "idade": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sexo": {
+            "type": "string",
+            "enum": [
+              "MASCULINO",
+              "FEMININO"
+            ]
+          },
+          "vivo": {
+            "type": "boolean"
+          },
+          "urlFoto": {
+            "type": "string"
+          },
+          "ultimaOcorrencia": {
+            "$ref": "#/components/schemas/OcorrenciaDTO"
+          }
+        }
+      },
+      "PagePessoaDTO": {
+        "type": "object",
+        "properties": {
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PessoaDTO"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "unpaged": {
+            "type": "boolean"
+          },
+          "paged": {
+            "type": "boolean"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "unsorted": {
+            "type": "boolean"
+          },
+          "sorted": {
+            "type": "boolean"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "EstatisticaPessoaDTO": {
+        "type": "object",
+        "properties": {
+          "quantPessoasDesaparecidas": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "quantPessoasEncontradas": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "MotivoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "descricao": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Authorization": {
+        "type": "http",
+        "in": "header",
+        "scheme": "Bearer"
+      }
+    }
+  }
+}
