@@ -3,7 +3,6 @@ import { Search, Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from './ui/input';
-import { ReportMissingPersonDialog } from './ReportMissingPersonDialog';
 
 export interface SearchFilters {
   nome?: string;
@@ -139,18 +138,6 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
             </Button>
           )}
         </div>
-
-        {/* Botão Denunciar */}
-        <ReportMissingPersonDialog>
-          <Button
-            variant="default"
-            size="lg"
-            disabled={loading}
-            className="bg-red-600 hover:bg-red-700 text-white font-medium"
-          >
-            Reportar Desaparecimento
-          </Button>
-        </ReportMissingPersonDialog>
       </div>
 
       {/* Filtros avançados */}

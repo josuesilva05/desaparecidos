@@ -1,5 +1,12 @@
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { 
+  Pagination as UIPagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious, 
+  PaginationEllipsis 
+} from '@/components/ui/pagination';
 
 interface PaginationProps {
   currentPage: number;
@@ -24,27 +31,34 @@ export function Pagination({
   const endItem = Math.min((currentPage + 1) * pageSize, totalElements);
 
   const getVisiblePages = () => {
-    const delta = 2;
+    const delta = 2; // Número de páginas para mostrar de cada lado da atual
     const range = [];
     const rangeWithDots = [];
 
-    for (let i = Math.max(0, currentPage - delta); 
-         i <= Math.min(totalPages - 1, currentPage + delta); 
-         i++) {
+    // Cria o range de páginas ao redor da página atual
+    const start = Math.max(0, currentPage - delta);
+    const end = Math.min(totalPages - 1, currentPage + delta);
+    
+    for (let i = start; i <= end; i++) {
       range.push(i);
     }
 
-    if (range[0] > 1) {
+    // Adiciona primeira página se não estiver no range
+    if (range[0] > 0) {
       rangeWithDots.push(0);
-      if (range[0] > 2) {
+      // Adiciona ellipsis se houver gap
+      if (range[0] > 1) {
         rangeWithDots.push(-1); // Representa "..."
       }
     }
 
+    // Adiciona o range principal
     rangeWithDots.push(...range);
 
-    if (range[range.length - 1] < totalPages - 2) {
-      if (range[range.length - 1] < totalPages - 3) {
+    // Adiciona última página se não estiver no range
+    if (range[range.length - 1] < totalPages - 1) {
+      // Adiciona ellipsis se houver gap
+      if (range[range.length - 1] < totalPages - 2) {
         rangeWithDots.push(-1); // Representa "..."
       }
       rangeWithDots.push(totalPages - 1);
@@ -58,88 +72,79 @@ export function Pagination({
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6">
       {/* Informações dos resultados */}
-      <div className="text-sm text-gray-700">
+      <div className="text-sm text-muted-foreground">
         Mostrando <span className="font-medium">{startItem}</span> a{' '}
         <span className="font-medium">{endItem}</span> de{' '}
         <span className="font-medium">{totalElements}</span> resultados
       </div>
 
-      {/* Controles de paginação */}
-      <div className="flex items-center space-x-1">
-        {/* Primeira página */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPageChange(0)}
-          disabled={currentPage === 0 || loading}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronsLeft className="h-4 w-4" />
-        </Button>
+      {/* Controles de paginação usando shadcn/ui */}
+      <UIPagination className="justify-end">
+        <PaginationContent>
+          {/* Página anterior */}
+          <PaginationItem>
+            <PaginationPrevious 
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                if (currentPage > 0 && !loading) {
+                  onPageChange(currentPage - 1);
+                }
+              }}
+              className={currentPage === 0 || loading ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+            />
+          </PaginationItem>
 
-        {/* Página anterior */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 0 || loading}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-
-        {/* Números das páginas */}
-        <div className="flex items-center space-x-1">
+          {/* Números das páginas */}
           {visiblePages.map((pageIndex, index) => {
             if (pageIndex === -1) {
               return (
-                <span key={`dots-${index}`} className="px-2 py-1 text-gray-500">
-                  ...
-                </span>
+                <PaginationItem key={`dots-${index}`}>
+                  <PaginationEllipsis />
+                </PaginationItem>
               );
             }
 
             return (
-              <Button
-                key={pageIndex}
-                variant={currentPage === pageIndex ? "default" : "outline"}
-                size="sm"
-                onClick={() => onPageChange(pageIndex)}
-                disabled={loading}
-                className={`h-8 w-8 p-0 ${
-                  currentPage === pageIndex
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'hover:bg-gray-50'
-                }`}
-              >
-                {pageIndex + 1}
-              </Button>
+              <PaginationItem key={pageIndex}>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (!loading) {
+                      onPageChange(pageIndex);
+                    }
+                  }}
+                  isActive={currentPage === pageIndex}
+                  className={`cursor-pointer transition-colors ${
+                    loading ? 'pointer-events-none opacity-50' : ''
+                  } ${
+                    currentPage === pageIndex 
+                      ? 'bg-primary text-primary-foreground font-semibold shadow-md hover:bg-primary/90' 
+                      : 'hover:bg-accent hover:text-accent-foreground'
+                  }`}
+                >
+                  {pageIndex + 1}
+                </PaginationLink>
+              </PaginationItem>
             );
           })}
-        </div>
 
-        {/* Próxima página */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages - 1 || loading}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-
-        {/* Última página */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPageChange(totalPages - 1)}
-          disabled={currentPage === totalPages - 1 || loading}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronsRight className="h-4 w-4" />
-        </Button>
-      </div>
+          {/* Próxima página */}
+          <PaginationItem>
+            <PaginationNext 
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                if (currentPage < totalPages - 1 && !loading) {
+                  onPageChange(currentPage + 1);
+                }
+              }}
+              className={currentPage === totalPages - 1 || loading ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </UIPagination>
     </div>
   );
 }

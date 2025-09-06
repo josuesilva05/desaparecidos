@@ -12,7 +12,7 @@ import {
 import type { PagePessoaDTO, PessoaDTO } from '@/types/models';
 import type { SearchFilters } from '@/components/SearchFilters';
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 10;
 
 export const Home = () => {
   const [pessoas, setPessoas] = useState<PessoaDTO[]>([]);
@@ -150,7 +150,7 @@ export const Home = () => {
 
         {/* Grid de cards */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
               <PersonCard 
                 key={index} 
@@ -161,7 +161,7 @@ export const Home = () => {
           </div>
         ) : hasResults ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {pessoas.map((pessoa) => (
                 <PersonCard 
                   key={pessoa.id || Math.random()} 

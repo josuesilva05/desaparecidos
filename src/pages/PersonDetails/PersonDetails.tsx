@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, User, Phone, AlertCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, User, Phone, AlertCircle, CheckCircle, Download, FileText, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { detalhaPessoaDesaparecida, buscarInformacoes } from '@/services/apiService';
 import type { PessoaDTO, OcorrenciaInformacaoDTO } from '@/types/models';
 import { PersonInformationForm } from '@/components/PersonInformationForm';
@@ -16,6 +17,31 @@ export default function PersonDetails() {
   const [informacoes, setInformacoes] = useState<OcorrenciaInformacaoDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  // Função para baixar arquivo
+  const downloadFile = (url: string, filename: string) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Função para verificar se é imagem
+  const isImageUrl = (url: string) => {
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    return imageExtensions.some(ext => url.toLowerCase().includes(ext));
+  };
+
+  // Função para obter nome do arquivo da URL
+  const getFileNameFromUrl = (url: string) => {
+    const urlParts = url.split('/');
+    const fileName = urlParts[urlParts.length - 1];
+    return fileName.split('?')[0] || 'arquivo';
+  };
 
   useEffect(() => {
     const fetchPersonDetails = async () => {
@@ -247,21 +273,58 @@ export default function PersonDetails() {
                   <CardTitle>Cartazes de Divulgação</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {person.ultimaOcorrencia.listaCartaz.map((cartaz, index) => (
-                      <div key={index} className="border rounded-lg p-4">
-                        <Badge variant="outline" className="mb-2">
-                          {cartaz.tipoCartaz?.replace('_', ' ')}
-                        </Badge>
-                        {cartaz.urlCartaz && (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => window.open(cartaz.urlCartaz, '_blank')}
-                          >
-                            Visualizar Cartaz
-                          </Button>
-                        )}
+                      <div key={index} className="border rounded-lg overflow-hidden">
+                        <div className="relative">
+                          {cartaz.urlCartaz && (
+                            <img 
+                              src={cartaz.urlCartaz} 
+                              alt={`Cartaz ${cartaz.tipoCartaz}`}
+                              className="w-full h-64 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                              onClick={() => setSelectedImage(cartaz.urlCartaz!)}
+                            />
+                          )}
+                          <div className="absolute top-2 left-2">
+                            <Badge variant="secondary" className="bg-white/90">
+                              {cartaz.tipoCartaz?.replace('_', ' ')}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="p-4 space-y-2">
+                          <div className="flex gap-2">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm" className="flex-1">
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  Visualizar
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl max-h-[90vh]">
+                                <DialogHeader>
+                                  <DialogTitle>Cartaz - {cartaz.tipoCartaz?.replace('_', ' ')}</DialogTitle>
+                                </DialogHeader>
+                                <div className="flex justify-center">
+                                  <img 
+                                    src={cartaz.urlCartaz} 
+                                    alt={`Cartaz ${cartaz.tipoCartaz}`}
+                                    className="max-w-full max-h-[70vh] object-contain"
+                                  />
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                            
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => downloadFile(cartaz.urlCartaz!, `cartaz_${index + 1}_${getFileNameFromUrl(cartaz.urlCartaz!)}`)}
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              Download
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -274,24 +337,94 @@ export default function PersonDetails() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Informações Recentes</CardTitle>
+                <CardTitle className="text-lg">Informações da Comunidade</CardTitle>
               </CardHeader>
               <CardContent>
                 {informacoes.length > 0 ? (
-                  <div className="space-y-4">
-                    {informacoes.slice(0, 3).map((info) => (
-                      <div key={info.id} className="border-l-4 border-blue-500 pl-4">
-                        <p className="text-sm text-gray-500 mb-1">
-                          {formatDate(info.data)}
-                        </p>
-                        <p className="text-sm">{info.informacao}</p>
+                  <div className="space-y-6">
+                    {informacoes.map((info) => (
+                      <div key={info.id} className="border-l-4 border-l-blue-500 pl-4 pb-4 border-b border-b-gray-100 last:border-b-0">
+                        <div className="flex justify-between items-start mb-2">
+                          <p className="text-sm text-gray-500">
+                            {formatDate(info.data)}
+                          </p>
+                          <Badge variant="outline" className="text-xs">
+                            ID: {info.id}
+                          </Badge>
+                        </div>
+                        <p className="text-sm mb-3">{info.informacao}</p>
+                        
+                        {/* Anexos da informação */}
+                        {info.anexos && info.anexos.length > 0 && (
+                          <div className="space-y-2">
+                            <p className="text-xs font-medium text-gray-600">Anexos ({info.anexos.length}):</p>
+                            <div className="grid grid-cols-2 gap-2">
+                              {info.anexos.map((anexo, anexoIndex) => (
+                                <div key={anexoIndex} className="relative">
+                                  {isImageUrl(anexo) ? (
+                                    <div className="relative group">
+                                      <img 
+                                        src={anexo} 
+                                        alt={`Anexo ${anexoIndex + 1}`}
+                                        className="w-full h-16 object-cover rounded cursor-pointer hover:opacity-75 transition-opacity"
+                                        onClick={() => setSelectedImage(anexo)}
+                                      />
+                                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                        <Eye className="h-4 w-4 text-white" />
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="w-full h-16 bg-gray-100 rounded flex items-center justify-center">
+                                      <FileText className="h-6 w-6 text-gray-400" />
+                                    </div>
+                                  )}
+                                  <div className="mt-1 flex gap-1">
+                                    <Dialog>
+                                      <DialogTrigger asChild>
+                                        <Button variant="ghost" size="sm" className="h-6 text-xs px-2 flex-1">
+                                          Ver
+                                        </Button>
+                                      </DialogTrigger>
+                                      <DialogContent className="max-w-4xl max-h-[90vh]">
+                                        <DialogHeader>
+                                          <DialogTitle>Anexo - {formatDate(info.data)}</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="flex justify-center">
+                                          {isImageUrl(anexo) ? (
+                                            <img 
+                                              src={anexo} 
+                                              alt={`Anexo ${anexoIndex + 1}`}
+                                              className="max-w-full max-h-[70vh] object-contain"
+                                            />
+                                          ) : (
+                                            <div className="text-center p-8">
+                                              <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                                              <p className="text-gray-600 mb-4">Arquivo não é uma imagem</p>
+                                              <Button onClick={() => window.open(anexo, '_blank')}>
+                                                Abrir arquivo
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </DialogContent>
+                                    </Dialog>
+                                    
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm"
+                                      className="h-6 text-xs px-2 flex-1"
+                                      onClick={() => downloadFile(anexo, `anexo_${info.id}_${anexoIndex + 1}_${getFileNameFromUrl(anexo)}`)}
+                                    >
+                                      <Download className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
-                    {informacoes.length > 3 && (
-                      <p className="text-sm text-gray-500">
-                        +{informacoes.length - 3} informações adicionais
-                      </p>
-                    )}
                   </div>
                 ) : (
                   <p className="text-sm text-gray-500">
@@ -347,6 +480,36 @@ export default function PersonDetails() {
             }
           }}
         />
+      )}
+
+      {/* Modal para visualização de imagem em tela cheia */}
+      {selectedImage && (
+        <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+          <DialogContent className="max-w-[95vw] max-h-[95vh] p-2">
+            <DialogHeader>
+              <DialogTitle>Visualização de Imagem</DialogTitle>
+            </DialogHeader>
+            <div className="flex justify-center items-center h-full">
+              <img 
+                src={selectedImage} 
+                alt="Visualização em tamanho grande"
+                className="max-w-full max-h-[80vh] object-contain"
+              />
+            </div>
+            <div className="flex justify-center mt-4">
+              <Button 
+                onClick={() => downloadFile(selectedImage, `imagem_${Date.now()}_${getFileNameFromUrl(selectedImage)}`)}
+                className="mr-2"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Baixar Imagem
+              </Button>
+              <Button variant="outline" onClick={() => setSelectedImage(null)}>
+                Fechar
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
