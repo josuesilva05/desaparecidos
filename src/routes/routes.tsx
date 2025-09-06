@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Layout } from '@/components/layout/Layout';
 
 // Lazy loading das páginas
 const Home = lazy(() => import('../pages/Home/Home').then(module => ({ default: module.Home })));
@@ -20,17 +21,21 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <Suspense fallback={<LoadingSkeleton />}>
-        <Home />
-      </Suspense>
+      <Layout>
+        <Suspense fallback={<LoadingSkeleton />}>
+          <Home />
+        </Suspense>
+      </Layout>
     ),
   },
   {
     path: "/person/:id",
     element: (
-      <Suspense fallback={<div className="container mx-auto p-6"><Skeleton className="h-screen w-full rounded-lg" /></div>}>
-        <PersonDetails />
-      </Suspense>
+      <Layout>
+        <Suspense fallback={<div className="container mx-auto p-6"><Skeleton className="h-screen w-full rounded-lg" /></div>}>
+          <PersonDetails />
+        </Suspense>
+      </Layout>
     ),
   },
 ]);

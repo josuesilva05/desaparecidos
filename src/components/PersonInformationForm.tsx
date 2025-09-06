@@ -1,35 +1,36 @@
-import { useState } from 'react';
-import { X, MapPin, Camera, Calendar, Phone, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Camera, Calendar, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { environment } from '@/environments/environment';
+import { adicionarInformacoes } from '@/services/apiService';
 
 interface PersonInformationFormProps {
   personId: number;
   personName: string;
   onClose: () => void;
-  onSubmit: (data: InformationFormData) => void;
+  onSubmit: (data: any) => void;
+  ocorrenciaId: number;
 }
 
-export interface InformationFormData {
-  informacao: string;
-  data: string;
-  localizacao: string;
-  telefone: string;
-  nomeContato: string;
-  fotos: File[];
+// Interface baseada exatamente no schema da API
+interface InformationFormData {
+  informacao: string;  // Informações sobre a visualização da pessoa (obrigatório)
+  descricao: string;   // Descrição do anexo (obrigatório)
+  data: string;        // Data da visualização (obrigatório)
+  fotos: File[];       // Arquivos (opcional)
 }
 
-export function PersonInformationForm({ personId, personName, onClose, onSubmit }: PersonInformationFormProps) {
+export function PersonInformationForm({ personName, onClose, onSubmit, ocorrenciaId }: PersonInformationFormProps) {
   const [formData, setFormData] = useState<InformationFormData>({
     informacao: '',
+    descricao: '',
     data: new Date().toISOString().split('T')[0],
-    localizacao: '',
-    telefone: '',
-    nomeContato: '',
     fotos: []
   });
 
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string>('');
 
   const handleInputChange = (field: keyof InformationFormData, value: string) => {
     setFormData(prev => ({
@@ -46,68 +47,74 @@ export function PersonInformationForm({ personId, personName, onClose, onSubmit 
       return isValidType && isValidSize;
     });
     
-    setSelectedFiles(prev => [...prev, ...validFiles].slice(0, 3)); // Max 3 fotos
     setFormData(prev => ({
       ...prev,
-      fotos: [...prev.fotos, ...validFiles].slice(0, 3)
+      fotos: [...prev.fotos, ...validFiles].slice(0, 3) // Max 3 fotos
     }));
   };
 
   const removeFile = (index: number) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
     setFormData(prev => ({
       ...prev,
       fotos: prev.fotos.filter((_, i) => i !== index)
     }));
   };
 
-  const formatPhoneNumber = (value: string) => {
-    // Remove todos os caracteres não numéricos
-    const numbers = value.replace(/\D/g, '');
-    
-    // Aplica a máscara (11) 99999-9999
-    if (numbers.length <= 2) {
-      return `(${numbers}`;
-    } else if (numbers.length <= 7) {
-      return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-    } else {
-      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
-    }
-  };
-
-  const handlePhoneChange = (value: string) => {
-    const formatted = formatPhoneNumber(value);
-    handleInputChange('telefone', formatted);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validações básicas conforme schema da API
     if (!formData.informacao.trim()) {
-      alert('Por favor, forneça as informações sobre o avistamento.');
+      alert('Por favor, descreva onde a pessoa foi vista (campo obrigatório).');
+      return;
+    }
+    
+    if (!formData.descricao.trim()) {
+      alert('Por favor, forneça uma descrição (campo obrigatório).');
       return;
     }
 
-    if (!formData.nomeContato.trim()) {
-      alert('Por favor, informe seu nome para contato.');
-      return;
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    try {
+      // Função helper para decidir se usar mock ou API real
+      const shouldUseMock = () => {
+        return 'useMockData' in environment && environment.useMockData;
+      };
+
+      if (shouldUseMock()) {
+        // Ambiente de desenvolvimento/mock
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        alert('Informação enviada com sucesso! Obrigado por ajudar.');
+      } else {
+        // Enviar para a API real
+        await adicionarInformacoes(
+          formData.informacao.trim(),
+          formData.descricao.trim(),  
+          formData.data,
+          ocorrenciaId,
+          formData.fotos.length > 0 ? formData.fotos : undefined
+        );
+
+        alert('Informação enviada com sucesso! Suas informações foram registradas e serão analisadas pelas autoridades competentes.');
+      }
+
+      onSubmit(formData);
+    } catch (error) {
+      console.error('Erro ao enviar informação:', error);
+      
+      let errorMessage = 'Erro ao enviar informação. Tente novamente.';
+      
+      if (error instanceof Error) {
+        errorMessage = `Erro: ${error.message}`;
+      }
+      
+      setSubmitError(errorMessage);
+      alert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    if (!formData.telefone.trim()) {
-      alert('Por favor, informe um telefone para contato.');
-      return;
-    }
-
-    // Mock: Em um sistema real, aqui seria feita a chamada à API
-    console.log('Enviando informação (MOCK):', {
-      personId,
-      ...formData,
-      timestamp: new Date().toISOString()
-    });
-
-    // Simula envio bem-sucedido
-    alert('Informação enviada com sucesso! Obrigado por ajudar.');
-    onSubmit(formData);
   };
 
   return (
@@ -132,150 +139,132 @@ export function PersonInformationForm({ personId, personName, onClose, onSubmit 
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Informações do avistamento */}
-            <div>
-              <label htmlFor="informacao" className="block text-sm font-medium text-gray-700 mb-2">
-                Informações sobre o avistamento *
+            {/* Campo Informação (obrigatório) */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Informações sobre onde viu a pessoa *
               </label>
               <textarea
-                id="informacao"
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Descreva onde e quando viu esta pessoa, o que ela estava fazendo, com quem estava, etc."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                placeholder="Ex: Foi vista em Cuiabá na rua ABC, número 123, utilizando saia rosa"
                 value={formData.informacao}
                 onChange={(e) => handleInputChange('informacao', e.target.value)}
+                maxLength={500}
                 required
               />
+              <div className="text-xs text-gray-500">
+                {formData.informacao.length}/500 caracteres
+              </div>
             </div>
 
-            {/* Data do avistamento */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="data" className="block text-sm font-medium text-gray-700 mb-2">
-                  <Calendar className="inline h-4 w-4 mr-1" />
-                  Data do avistamento *
-                </label>
+            {/* Campo Descrição (obrigatório) */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Descrição *
+              </label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ex: Foto da pessoa avistada, Relato de vizinho, etc."
+                value={formData.descricao}
+                onChange={(e) => handleInputChange('descricao', e.target.value)}
+                maxLength={200}
+                required
+              />
+              <div className="text-xs text-gray-500">
+                {formData.descricao.length}/200 caracteres
+              </div>
+            </div>
+
+            {/* Campo Data (obrigatório) */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Data do avistamento *
+              </label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
                   type="date"
-                  id="data"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={formData.data}
                   onChange={(e) => handleInputChange('data', e.target.value)}
                   max={new Date().toISOString().split('T')[0]}
                   required
                 />
               </div>
-
-              <div>
-                <label htmlFor="localizacao" className="block text-sm font-medium text-gray-700 mb-2">
-                  <MapPin className="inline h-4 w-4 mr-1" />
-                  Local do avistamento
-                </label>
-                <input
-                  type="text"
-                  id="localizacao"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Ex: Shopping Center Norte, São Paulo"
-                  value={formData.localizacao}
-                  onChange={(e) => handleInputChange('localizacao', e.target.value)}
-                />
-              </div>
             </div>
 
-            {/* Dados de contato */}
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Seus dados para contato
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="nomeContato" className="block text-sm font-medium text-gray-700 mb-2">
-                    <User className="inline h-4 w-4 mr-1" />
-                    Seu nome *
-                  </label>
-                  <input
-                    type="text"
-                    id="nomeContato"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Como podemos te chamar?"
-                    value={formData.nomeContato}
-                    onChange={(e) => handleInputChange('nomeContato', e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="telefone" className="block text-sm font-medium text-gray-700 mb-2">
-                    <Phone className="inline h-4 w-4 mr-1" />
-                    Telefone para contato *
-                  </label>
-                  <input
-                    type="tel"
-                    id="telefone"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="(11) 99999-9999"
-                    value={formData.telefone}
-                    onChange={(e) => handlePhoneChange(e.target.value)}
-                    maxLength={15}
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Upload de fotos */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Camera className="inline h-4 w-4 mr-1" />
-                Fotos do avistamento (opcional)
+            {/* Campo Arquivos (opcional) */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Fotos (opcional)
               </label>
-              <p className="text-xs text-gray-500 mb-3">
-                Você pode anexar até 3 fotos. Máximo 5MB cada.
-              </p>
               
-              {selectedFiles.length < 3 && (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors">
+              <div className="flex items-center space-x-4">
+                <div className="flex-1">
                   <input
                     type="file"
                     multiple
                     accept="image/*"
                     onChange={handleFileSelect}
                     className="hidden"
-                    id="foto-upload"
+                    id="file-upload"
+                    disabled={formData.fotos.length >= 3}
                   />
-                  <label htmlFor="foto-upload" className="cursor-pointer">
-                    <Camera className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600">
-                      Clique para selecionar fotos
-                    </p>
+                  <label
+                    htmlFor="file-upload"
+                    className={`cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium ${
+                      formData.fotos.length >= 3
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <Camera className="mr-2 h-4 w-4" />
+                    {formData.fotos.length >= 3 ? 'Máximo atingido' : 'Adicionar Foto'}
                   </label>
                 </div>
-              )}
+                <div className="text-xs text-gray-500">
+                  Máximo: 3 fotos, 5MB cada
+                </div>
+              </div>
 
-              {selectedFiles.length > 0 && (
-                <div className="mt-4 grid grid-cols-3 gap-4">
-                  {selectedFiles.map((file, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={`Preview ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg border"
-                      />
+              {/* Lista de arquivos selecionados */}
+              {formData.fotos.length > 0 && (
+                <div className="space-y-2">
+                  {formData.fotos.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
+                      <div className="flex items-center space-x-3">
+                        <Camera className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-700 truncate">{file.name}</span>
+                        <span className="text-xs text-gray-500">
+                          ({Math.round(file.size / 1024)}KB)
+                        </span>
+                      </div>
                       <Button
                         type="button"
-                        variant="destructive"
+                        variant="ghost"
                         size="sm"
-                        className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
                         onClick={() => removeFile(index)}
+                        className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="h-4 w-4" />
                       </Button>
                     </div>
                   ))}
                 </div>
               )}
             </div>
+
+            {/* Erro de envio */}
+            {submitError && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <p className="text-sm text-red-800">
+                  <AlertCircle className="inline h-4 w-4 mr-1" />
+                  {submitError}
+                </p>
+              </div>
+            )}
 
             {/* Aviso de privacidade */}
             <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
@@ -292,14 +281,16 @@ export function PersonInformationForm({ personId, personName, onClose, onSubmit 
                 variant="outline"
                 onClick={onClose}
                 className="flex-1"
+                disabled={isSubmitting}
               >
                 Cancelar
               </Button>
               <Button
                 type="submit"
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={isSubmitting}
               >
-                Enviar Informação
+                {isSubmitting ? 'Enviando...' : 'Enviar Informação'}
               </Button>
             </div>
           </form>

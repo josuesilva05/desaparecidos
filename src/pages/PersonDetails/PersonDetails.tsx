@@ -336,10 +336,15 @@ export default function PersonDetails() {
         <PersonInformationForm
           personId={parseInt(id!)}
           personName={person.nome || ''}
+          ocorrenciaId={person.ultimaOcorrencia?.ocoId || 0}
           onClose={() => setShowForm(false)}
           onSubmit={(data: any) => {
             console.log('Informação enviada:', data);
             setShowForm(false);
+            // Recarregar as informações após envio bem-sucedido
+            if (person.ultimaOcorrencia?.ocoId) {
+              buscarInformacoes(person.ultimaOcorrencia.ocoId).then(setInformacoes);
+            }
           }}
         />
       )}

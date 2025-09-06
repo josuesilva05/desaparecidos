@@ -89,17 +89,12 @@ export const Home = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-6 py-8">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
-              <SearchIcon className="h-10 w-10 text-blue-600" />
-              Pessoas Desaparecidas
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Sistema de busca e localização de pessoas desaparecidas. 
-              Se você tem informações sobre alguma dessas pessoas, entre em contato.
-            </p>
-          </div>
+        <div className="container mx-auto px-6 py-6">
+          
+          {/* <div className="text-center mb-8">
+
+          
+          </div> */}
 
           {/* Estatísticas */}
           <StatisticsCards />
