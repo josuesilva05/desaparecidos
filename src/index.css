@@ -179,6 +179,37 @@
     background-color: #94a3b8;
   }
 
+  /* Estilo específico para cards com altura limitada */
+  .limited-height-card {
+    min-height: 300px;
+    max-height: 600px;
+  }
+
+  .limited-height-card .card-content {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #e2e8f0 transparent;
+  }
+
+  .limited-height-card .card-content::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .limited-height-card .card-content::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 4px;
+  }
+
+  .limited-height-card .card-content::-webkit-scrollbar-thumb {
+    background-color: #e2e8f0;
+    border-radius: 4px;
+    border: 1px solid #f1f5f9;
+  }
+
+  .limited-height-card .card-content::-webkit-scrollbar-thumb:hover {
+    background-color: #cbd5e1;
+  }
+
   /* Animação para os quadradinhos dos anexos */
   .attachment-grid-item {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

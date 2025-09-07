@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AlertTriangle, Heart, Search as SearchIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { PersonCard } from '@/pages/Home/PersonCard';
 import { SearchFiltersComponent } from '@/pages/Home/SearchFilters';
 import { Pagination } from '@/pages/Home/Pagination';
 import { StatisticsCards } from '@/pages/Home/StatisticsCards';
+import { useAlert } from '@/hooks/useAlert';
 import { 
   listaUltimasPessoasDesaparecidas, 
   listaPessoasDesaparecidasPeloFiltro 
@@ -15,6 +17,7 @@ import type { SearchFilters } from '@/pages/Home/SearchFilters';
 const ITEMS_PER_PAGE = 10;
 
 export const Home = () => {
+  // const { success, error: showError } = useAlert();
   const [pessoas, setPessoas] = useState<PessoaDTO[]>([]);
   const [pageInfo, setPageInfo] = useState<PagePessoaDTO>({});
   const [currentPage, setCurrentPage] = useState(0);
@@ -56,7 +59,7 @@ export const Home = () => {
       setPageInfo(response);
     } catch (err) {
       console.error('Erro ao buscar pessoas:', err);
-      setError('Erro ao carregar dados. Tente novamente.');
+      setError('Ocorreu um problema ao carregar os dados. Tente novamente mais tarde.');
       setPessoas([]);
       setPageInfo({});
     } finally {
@@ -109,6 +112,25 @@ export const Home = () => {
 
       {/* Conteúdo principal */}
       <div className="container mx-auto px-6 py-8">
+        {/* Botões de teste dos alertas - REMOVER EM PRODUÇÃO */}
+        {/* <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h3 className="text-sm font-medium text-yellow-800 mb-3">Teste dos Alertas (Dev)</h3>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => success('Teste de alerta de sucesso! Tudo funcionando perfeitamente.')}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Testar Sucesso
+            </Button>
+            <Button
+              onClick={() => showError('Teste de alerta de erro! Algo deu errado.')}
+              variant="destructive"
+            >
+              Testar Erro
+            </Button>
+          </div>
+        </div> */}
+
         {/* Mensagens de estado */}
         {error && (
           <Card className="mb-6 border-red-200 bg-red-50">

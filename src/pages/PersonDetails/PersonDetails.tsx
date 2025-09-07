@@ -12,6 +12,7 @@ import {
   FileText,
   Eye,
 } from "lucide-react";
+import placeholderImage from '@/assets/pessoa_desaparecida.png';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,8 +36,8 @@ export default function PersonDetails() {
   const [person, setPerson] = useState<PessoaDTO | null>(null);
   const [informacoes, setInformacoes] = useState<OcorrenciaInformacaoDTO[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   // Função para baixar arquivo
   const downloadFile = (url: string, filename: string) => {
@@ -214,13 +215,39 @@ export default function PersonDetails() {
               </Badge>
             </div>
 
-            <Button
-              onClick={() => setShowForm(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <AlertCircle className="mr-2 h-4 w-4" />
-              Fornecer Informação
-            </Button>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <AlertCircle className="mr-2 h-4 w-4" />
+                  Fornecer Informação
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[90vh] overflow-y-auto w-[calc(100vw-2rem)] sm:w-[calc(100vw-3rem)] max-w-2xl">
+                <div className="px-4 sm:px-6">
+                  <DialogHeader className="items-start text-left space-y-1 mb-4">
+                    <DialogTitle className="text-left">Fornecer Informação</DialogTitle>
+                    <p className="text-sm text-gray-600">
+                      Sobre: <span className="font-medium">{person.nome}</span>
+                    </p>
+                  </DialogHeader>
+                  <PersonInformationForm
+                    personId={parseInt(id!)}
+                    ocorrenciaId={person.ultimaOcorrencia?.ocoId || 0}
+                    onClose={() => setDialogOpen(false)}
+                    onSubmit={(data: any) => {
+                      console.log("Informação enviada:", data);
+                      setDialogOpen(false);
+                      // Recarregar as informações após envio bem-sucedido
+                      if (person.ultimaOcorrencia?.ocoId) {
+                        buscarInformacoes(person.ultimaOcorrencia.ocoId).then(
+                          setInformacoes
+                        );
+                      }
+                    }}
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -235,21 +262,14 @@ export default function PersonDetails() {
                   <div className="flex-shrink-0">
                     <div className="w-72 h-80 mx-auto md:mx-0 rounded-lg overflow-hidden shadow-md">
                       <img
-                        src={person.urlFoto}
-                        alt={person.nome}
+                        src={person.urlFoto || placeholderImage}
+                        alt={person.nome || 'Pessoa desaparecida'}
                         className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
                         onClick={() => setSelectedImage(person.urlFoto || null)}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = "none";
-                          target.nextElementSibling?.classList.remove("hidden");
+                        onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                          e.currentTarget.src = placeholderImage;
                         }}
                       />
-                      <div className="w-full h-full bg-gray-200 rounded-lg items-center justify-center hidden">
-                        <span className="text-6xl text-gray-400 font-semibold">
-                          {person.nome?.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
                     </div>
                   </div>
 
@@ -332,9 +352,8 @@ export default function PersonDetails() {
             </Card>
 
             {/* Informações reportadas */}
-            <Card className="flex-1 flex flex-col">
-              {" "}
-              {/* Usar flex para ocupar espaço disponível */}
+            <Card className="flex-1 flex flex-col limited-height-card">
+              {/* Card com altura limitada e scroll melhorado */}
               <CardHeader className="flex-shrink-0 border-b">
                 <CardTitle className="flex items-center justify-between">
                   <span>Informações Reportadas</span>
@@ -346,9 +365,8 @@ export default function PersonDetails() {
                   )}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-0 flex-1 overflow-y-auto custom-scrollbar">
-                {" "}
-                {/* Flex-1 para ocupar espaço restante */}
+              <CardContent className="p-0 flex-1 overflow-y-auto custom-scrollbar min-h-0 card-content">
+                {/* Aplicar classe card-content para scroll customizado */}
                 {informacoes.length > 0 ? (
                   <div className="p-4 space-y-4">
                     {informacoes.map((info) => (
@@ -515,15 +533,19 @@ export default function PersonDetails() {
               </Card>
             )}
 
-            {/* Card de contato e cartazes - com altura expandida */}
+            {/* Card de contato e cartazes - acompanha altura do outro card */}
             <Card className="!gap-3 flex-1 flex flex-col">
+              {/* Card que acompanha a altura do card de informações reportadas */}
               <CardHeader className="flex-shrink-0">
                 <CardTitle className="text-lg">
                   Informações de Emergência
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col justify-between space-y-4">
-                <div className="p-4 bg-red-50 rounded-lg mt-auto flex-shrink-0">
+              <CardContent className="flex-1 flex flex-col space-y-4">
+                {/* Remove scroll - card acompanha altura naturalmente */}
+                
+                {/* Seção de contato no topo do card */}
+                <div className="p-4 bg-red-50 rounded-lg flex-shrink-0">
                   <h4 className="font-semibold text-red-800 mb-2">
                     Viu esta pessoa?
                   </h4>
@@ -539,165 +561,143 @@ export default function PersonDetails() {
                     </div>
                   </div>
                 </div>
+
+                {/* Seção principal com cartazes */}
+                <div className="flex-1 space-y-4">
                 {person.ultimaOcorrencia?.listaCartaz &&
                 person.ultimaOcorrencia.listaCartaz.length > 0 ? (
-                  <div className="flex-1">
-                    <div className="grid grid-cols-1 gap-4">
-                      {person.ultimaOcorrencia.listaCartaz.map(
-                        (cartaz, index) => (
-                          <div
-                            key={index}
-                            className="border rounded-lg overflow-hidden"
-                          >
-                            <div className="relative">
-                              {cartaz.urlCartaz && (
-                                <img
-                                  src={cartaz.urlCartaz}
-                                  alt={`Cartaz ${cartaz.tipoCartaz}`}
-                                  className="w-full h-100 object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                                  onClick={() =>
-                                    setSelectedImage(cartaz.urlCartaz!)
-                                  }
-                                />
-                              )}
-                              <div className="absolute top-2 left-2">
-                                <Badge
-                                  variant="secondary"
-                                  className="bg-white/90 text-xs"
-                                >
-                                  CARTAZ DE DESAPARECIMENTO
-                                </Badge>
-                              </div>
+                  <div className="grid grid-cols-1 gap-4">
+                    {person.ultimaOcorrencia.listaCartaz.map(
+                      (cartaz, index) => (
+                        <div
+                          key={index}
+                          className="border rounded-lg overflow-hidden"
+                        >
+                          <div className="relative">
+                            {cartaz.urlCartaz && (
+                              <img
+                                src={cartaz.urlCartaz}
+                                alt={`Cartaz ${cartaz.tipoCartaz}`}
+                                className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                onClick={() =>
+                                  setSelectedImage(cartaz.urlCartaz!)
+                                }
+                              />
+                            )}
+                            <div className="absolute top-2 left-2">
+                              <Badge
+                                variant="secondary"
+                                className="bg-white/90 text-xs"
+                              >
+                                CARTAZ DE DESAPARECIMENTO
+                              </Badge>
                             </div>
-                            <div className="p-3 space-y-2">
-                              <div className="flex gap-2">
-                                <Dialog>
-                                  <DialogTrigger asChild>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="flex-1 text-xs"
-                                    >
-                                      <Eye className="mr-1 h-3 w-3" />
-                                      Ver
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent className="max-w-4xl max-h-[90vh]">
-                                    <DialogHeader>
-                                      <DialogTitle>
-                                        Cartaz -{" "}
-                                        {cartaz.tipoCartaz?.replace("_", " ")}
-                                      </DialogTitle>
-                                    </DialogHeader>
-                                    <div className="flex justify-center">
-                                      <img
-                                        src={cartaz.urlCartaz}
-                                        alt={`Cartaz ${cartaz.tipoCartaz}`}
-                                        className="max-w-full max-h-[70vh] object-contain"
-                                      />
-                                    </div>
-                                  </DialogContent>
-                                </Dialog>
+                          </div>
+                          <div className="p-3 space-y-2">
+                            <div className="flex gap-2">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1 text-xs"
+                                  >
+                                    <Eye className="mr-1 h-3 w-3" />
+                                    Ver
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-4xl max-h-[90vh]">
+                                  <DialogHeader>
+                                    <DialogTitle>
+                                      Cartaz -{" "}
+                                      {cartaz.tipoCartaz?.replace("_", " ")}
+                                    </DialogTitle>
+                                  </DialogHeader>
+                                  <div className="flex justify-center">
+                                    <img
+                                      src={cartaz.urlCartaz}
+                                      alt={`Cartaz ${cartaz.tipoCartaz}`}
+                                      className="max-w-full max-h-[70vh] object-contain"
+                                    />
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
 
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="flex-1 text-xs"
-                                  onClick={() =>
-                                    downloadFile(
-                                      cartaz.urlCartaz!,
-                                      `cartaz_${index + 1}_${getFileNameFromUrl(
-                                        cartaz.urlCartaz!
-                                      )}`
-                                    )
-                                  }
-                                >
-                                  <Download className="mr-1 h-3 w-3" />
-                                  Download
-                                </Button>
-                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="flex-1 text-xs"
+                                onClick={() =>
+                                  downloadFile(
+                                    cartaz.urlCartaz!,
+                                    `cartaz_${index + 1}_${getFileNameFromUrl(
+                                      cartaz.urlCartaz!
+                                    )}`
+                                  )
+                                }
+                              >
+                                <Download className="mr-1 h-3 w-3" />
+                                Download
+                              </Button>
                             </div>
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex-1">
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="border rounded-lg overflow-hidden">
-                        <div className="relative">
-                          <div className="w-full h-100 bg-gray-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center">
-                            <FileText className="h-12 w-12 text-gray-400 mb-3" />
-                            <p className="text-sm text-gray-600 font-medium text-center px-4">
-                              Cartaz não disponível para essa pessoa
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1 text-center px-4">
-                              Nenhum cartaz foi gerado ainda
-                            </p>
-                          </div>
-                          <div className="absolute top-2 left-2">
-                            <Badge
-                              variant="secondary"
-                              className="bg-white/90 text-xs"
-                            >
-                              CARTAZ DE DESAPARECIMENTO
-                            </Badge>
                           </div>
                         </div>
-                        <div className="p-3 space-y-2">
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="flex-1 text-xs"
-                              disabled
-                            >
-                              <Eye className="mr-1 h-3 w-3" />
-                              Ver
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="flex-1 text-xs"
-                              disabled
-                            >
-                              <Download className="mr-1 h-3 w-3" />
-                              Download
-                            </Button>
-                          </div>
+                      )
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="relative">
+                        <div className="w-full h-100 bg-gray-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center">
+                          <FileText className="h-12 w-12 text-gray-400 mb-3" />
+                          <p className="text-sm text-gray-600 font-medium text-center px-4">
+                            Cartaz não disponível para essa pessoa
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1 text-center px-4">
+                            Nenhum cartaz foi gerado ainda
+                          </p>
+                        </div>
+                        <div className="absolute top-2 left-2">
+                          <Badge
+                            variant="secondary"
+                            className="bg-white/90 text-xs"
+                          >
+                            CARTAZ DE DESAPARECIMENTO
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="p-3 space-y-2">
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 text-xs"
+                            disabled
+                          >
+                            <Eye className="mr-1 h-3 w-3" />
+                            Ver
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 text-xs"
+                            disabled
+                          >
+                            <Download className="mr-1 h-3 w-3" />
+                            Download
+                          </Button>
                         </div>
                       </div>
                     </div>
                   </div>
                 )}
-
-                {/* Seção de contato que fica no final do card */}
+                </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
-
-      {/* Modal do formulário */}
-      {showForm && (
-        <PersonInformationForm
-          personId={parseInt(id!)}
-          personName={person.nome || ""}
-          ocorrenciaId={person.ultimaOcorrencia?.ocoId || 0}
-          onClose={() => setShowForm(false)}
-          onSubmit={(data: any) => {
-            console.log("Informação enviada:", data);
-            setShowForm(false);
-            // Recarregar as informações após envio bem-sucedido
-            if (person.ultimaOcorrencia?.ocoId) {
-              buscarInformacoes(person.ultimaOcorrencia.ocoId).then(
-                setInformacoes
-              );
-            }
-          }}
-        />
-      )}
 
       {/* Modal para visualização de imagem em tela cheia */}
       {selectedImage && (

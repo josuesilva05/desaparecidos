@@ -86,7 +86,7 @@ export const adicionarInformacoes = async (
       
       if (status === 404) throw new Error('Ocorrência não encontrada');
       if (status === 400) throw new Error(responseData?.message || 'Dados inválidos');
-      if (status === 500) throw new Error('Erro no servidor. Tente novamente.');
+      if (status === 500) throw new Error('Erro no servidor. Tente novamente mais tarde.');
     }
     
     throw error;
@@ -165,7 +165,7 @@ export const listaUltimasPessoasDesaparecidas = async (
   direcao?: string,
   status?: string
 ): Promise<PagePessoaDTO> => {
-  const res = await api.get('/pessoas/aberto', {
+  const res = await api.get('/pessoas/aberto/filtro', {
     params: { pagina, porPagina, direcao, status }
   });
   return res.data;

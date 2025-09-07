@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { X, Camera, Calendar, AlertCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { X, Camera, AlertCircle, ChevronDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { useAlert } from '@/hooks/useAlert';
 import { adicionarInformacoes } from '@/services/apiService';
 
 interface PersonInformationFormProps {
   personId: number;
-  personName: string;
   onClose: () => void;
   onSubmit: (data: any) => void;
   ocorrenciaId: number;
@@ -20,7 +24,8 @@ interface InformationFormData {
   fotos: File[];       // Arquivos (opcional)
 }
 
-export function PersonInformationForm({ personName, onClose, onSubmit, ocorrenciaId }: PersonInformationFormProps) {
+export function PersonInformationForm({ onClose, onSubmit, ocorrenciaId }: PersonInformationFormProps) {
+  const { success, error: showError } = useAlert();
   const [formData, setFormData] = useState<InformationFormData>({
     informacao: '',
     descricao: '',
@@ -28,8 +33,18 @@ export function PersonInformationForm({ personName, onClose, onSubmit, ocorrenci
     fotos: []
   });
 
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [isDateOpen, setIsDateOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string>('');
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+
+  // Limpar URLs quando o componente for desmontado ou fotos mudarem
+  React.useEffect(() => {
+    return () => {
+      previewUrls.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
 
   const handleInputChange = (field: keyof InformationFormData, value: string) => {
     setFormData(prev => ({
@@ -46,17 +61,37 @@ export function PersonInformationForm({ personName, onClose, onSubmit, ocorrenci
       return isValidType && isValidSize;
     });
     
+    const newFiles = [...formData.fotos, ...validFiles].slice(0, 6); // Max 6 fotos
+    
+    // Limpar URLs antigos
+    previewUrls.forEach(url => URL.revokeObjectURL(url));
+    
+    // Criar novos URLs para preview
+    const newUrls = newFiles.map(file => URL.createObjectURL(file));
+    
     setFormData(prev => ({
       ...prev,
-      fotos: [...prev.fotos, ...validFiles].slice(0, 3) // Max 3 fotos
+      fotos: newFiles
     }));
+    
+    setPreviewUrls(newUrls);
   };
 
   const removeFile = (index: number) => {
+    // Revogar URL do arquivo removido
+    if (previewUrls[index]) {
+      URL.revokeObjectURL(previewUrls[index]);
+    }
+    
+    const newFiles = formData.fotos.filter((_, i) => i !== index);
+    const newUrls = previewUrls.filter((_, i) => i !== index);
+    
     setFormData(prev => ({
       ...prev,
-      fotos: prev.fotos.filter((_, i) => i !== index)
+      fotos: newFiles
     }));
+    
+    setPreviewUrls(newUrls);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,14 +99,17 @@ export function PersonInformationForm({ personName, onClose, onSubmit, ocorrenci
     
     // Validações básicas conforme schema da API
     if (!formData.informacao.trim()) {
-      alert('Por favor, descreva onde a pessoa foi vista (campo obrigatório).');
+      showError('Por favor, descreva onde a pessoa foi vista (campo obrigatório).');
       return;
     }
     
     if (!formData.descricao.trim()) {
-      alert('Por favor, forneça uma descrição (campo obrigatório).');
+      showError('Por favor, forneça uma descrição (campo obrigatório).');
       return;
     }
+
+    // Atualizar a data do formData com a data selecionada
+    const dataToSubmit = selectedDate ? selectedDate.toISOString().split('T')[0] : formData.data;
 
     setIsSubmitting(true);
     setSubmitError('');
@@ -81,113 +119,109 @@ export function PersonInformationForm({ personName, onClose, onSubmit, ocorrenci
       await adicionarInformacoes(
         formData.informacao.trim(),
         formData.descricao.trim(),  
-        formData.data,
+        dataToSubmit,
         ocorrenciaId,
         formData.fotos.length > 0 ? formData.fotos : undefined
       );
 
-      alert('Informação enviada com sucesso! Suas informações foram registradas e serão analisadas pelas autoridades competentes.');
+      success('Informações enviadas com sucesso!');
       
-      onSubmit(formData);
+      // Dar tempo para o alert aparecer antes de fechar o modal
+      setTimeout(() => {
+        onSubmit(formData);
+      }, 1000);
     } catch (error) {
       console.error('Erro ao enviar informação:', error);
       
-      let errorMessage = 'Erro ao enviar informação. Tente novamente.';
+      let errorMessage = 'Erro ao enviar informação. Tente novamente mais tarde.';
       
       if (error instanceof Error) {
         errorMessage = `Erro: ${error.message}`;
       }
       
       setSubmitError(errorMessage);
-      alert(errorMessage);
+      showError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
-          <div>
-            <CardTitle className="text-xl">Fornecer Informação</CardTitle>
-            <p className="text-sm text-gray-600 mt-1">
-              Sobre: <span className="font-medium">{personName}</span>
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="h-8 w-8 p-0"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </CardHeader>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Campo Informação (obrigatório) */}
+      <div className="space-y-2">
+        <Label htmlFor="informacao">
+          Informações sobre onde viu a pessoa *
+        </Label>
+        <Textarea
+          id="informacao"
+          rows={4}
+          placeholder="Ex: Foi vista em Cuiabá na rua ABC, número 123, utilizando saia rosa"
+          value={formData.informacao}
+          onChange={(e) => handleInputChange('informacao', e.target.value)}
+          maxLength={500}
+          required
+        />
+        <div className="text-xs text-muted-foreground">
+          {formData.informacao.length}/500 caracteres
+        </div>
+      </div>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Campo Informação (obrigatório) */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Informações sobre onde viu a pessoa *
-              </label>
-              <textarea
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                placeholder="Ex: Foi vista em Cuiabá na rua ABC, número 123, utilizando saia rosa"
-                value={formData.informacao}
-                onChange={(e) => handleInputChange('informacao', e.target.value)}
-                maxLength={500}
-                required
-              />
-              <div className="text-xs text-gray-500">
-                {formData.informacao.length}/500 caracteres
-              </div>
-            </div>
+      {/* Campo Descrição (obrigatório) */}
+      <div className="space-y-2">
+        <Label htmlFor="descricao">
+          Descrição *
+        </Label>
+        <Input
+          id="descricao"
+          type="text"
+          placeholder="Ex: Foto da pessoa avistada, Relato de vizinho, etc."
+          value={formData.descricao}
+          onChange={(e) => handleInputChange('descricao', e.target.value)}
+          maxLength={200}
+          required
+        />
+        <div className="text-xs text-muted-foreground">
+          {formData.descricao.length}/200 caracteres
+        </div>
+      </div>
 
-            {/* Campo Descrição (obrigatório) */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Descrição *
-              </label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Ex: Foto da pessoa avistada, Relato de vizinho, etc."
-                value={formData.descricao}
-                onChange={(e) => handleInputChange('descricao', e.target.value)}
-                maxLength={200}
-                required
-              />
-              <div className="text-xs text-gray-500">
-                {formData.descricao.length}/200 caracteres
-              </div>
-            </div>
-
-            {/* Campo Data (obrigatório) */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Data do avistamento *
-              </label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <input
-                  type="date"
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  value={formData.data}
-                  onChange={(e) => handleInputChange('data', e.target.value)}
-                  max={new Date().toISOString().split('T')[0]}
-                  required
-                />
-              </div>
-            </div>
+      {/* Campo Data (obrigatório) */}
+      <div className="space-y-2">
+        <Label htmlFor="data">
+          Data do avistamento *
+        </Label>
+        <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              id="data"
+              className="w-full justify-between font-normal"
+            >
+              {selectedDate ? selectedDate.toLocaleDateString('pt-BR') : "Selecionar data"}
+              <ChevronDownIcon className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+            <CalendarComponent
+              mode="single"
+              selected={selectedDate}
+              captionLayout="dropdown"
+              onSelect={(date) => {
+                setSelectedDate(date)
+                setIsDateOpen(false)
+              }}
+              disabled={(date) => date > new Date()}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
 
             {/* Campo Arquivos (opcional) */}
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium">
                 Fotos (opcional)
-              </label>
+              </Label>
               
               <div className="flex items-center space-x-4">
                 <div className="flex-1">
@@ -198,46 +232,58 @@ export function PersonInformationForm({ personName, onClose, onSubmit, ocorrenci
                     onChange={handleFileSelect}
                     className="hidden"
                     id="file-upload"
-                    disabled={formData.fotos.length >= 3}
+                    disabled={formData.fotos.length >= 6}
                   />
-                  <label
-                    htmlFor="file-upload"
-                    className={`cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium ${
-                      formData.fotos.length >= 3
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    asChild
+                    disabled={formData.fotos.length >= 6}
                   >
-                    <Camera className="mr-2 h-4 w-4" />
-                    {formData.fotos.length >= 3 ? 'Máximo atingido' : 'Adicionar Foto'}
-                  </label>
+                    <label
+                      htmlFor="file-upload"
+                      className={`cursor-pointer inline-flex items-center ${
+                        formData.fotos.length >= 6 ? 'cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <Camera className="mr-2 h-4 w-4" />
+                      {formData.fotos.length >= 6 ? 'Máximo atingido' : 'Adicionar Foto'}
+                    </label>
+                  </Button>
                 </div>
-                <div className="text-xs text-gray-500">
-                  Máximo: 3 fotos, 5MB cada
+                <div className="text-xs text-muted-foreground">
+                  Máximo: 6 fotos, 5MB cada
                 </div>
               </div>
 
-              {/* Lista de arquivos selecionados */}
+              {/* Lista de arquivos selecionados como thumbnails */}
               {formData.fotos.length > 0 && (
-                <div className="space-y-2">
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                   {formData.fotos.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                      <div className="flex items-center space-x-3">
-                        <Camera className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-700 truncate">{file.name}</span>
-                        <span className="text-xs text-gray-500">
-                          ({Math.round(file.size / 1024)}KB)
-                        </span>
+                    <div key={index} className="relative group">
+                      <div className="aspect-square rounded-md overflow-hidden bg-gray-100 border-2 border-gray-200 hover:border-blue-300 transition-colors">
+                        <img
+                          src={previewUrls[index]}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
+                      
+                      {/* Botão de remover */}
                       <Button
                         type="button"
-                        variant="ghost"
+                        variant="destructive"
                         size="sm"
                         onClick={() => removeFile(index)}
-                        className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                        className="absolute -top-1 -right-1 h-5 w-5 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-2 w-2" />
                       </Button>
+                      
+                      {/* Info do arquivo - aparece no hover */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1 text-center opacity-0 group-hover:opacity-100 transition-opacity rounded-b-md">
+                        {Math.round(file.size / 1024)}KB
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -246,8 +292,8 @@ export function PersonInformationForm({ personName, onClose, onSubmit, ocorrenci
 
             {/* Erro de envio */}
             {submitError && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <p className="text-sm text-red-800">
+              <div className="bg-destructive/15 border border-destructive/30 rounded-md p-4">
+                <p className="text-sm text-destructive">
                   <AlertCircle className="inline h-4 w-4 mr-1" />
                   {submitError}
                 </p>
@@ -255,14 +301,12 @@ export function PersonInformationForm({ personName, onClose, onSubmit, ocorrenci
             )}
 
             {/* Aviso de privacidade */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-              <p className="text-sm text-yellow-800">
-                <strong>Importante:</strong> Suas informações serão compartilhadas com as autoridades competentes 
-                para auxiliar nas investigações. Os dados pessoais serão tratados conforme a LGPD.
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
+              <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                <strong>Importante:</strong> Fornecer informações falsas podem levar a consequências legais.
               </p>
             </div>
 
-            {/* Botões */}
             <div className="flex flex-col sm:flex-row gap-3 pt-6">
               <Button
                 type="button"
@@ -282,8 +326,5 @@ export function PersonInformationForm({ personName, onClose, onSubmit, ocorrenci
               </Button>
             </div>
           </form>
-        </CardContent>
-      </Card>
-    </div>
   );
 }

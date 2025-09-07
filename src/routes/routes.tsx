@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Layout } from '@/components/layout/Layout';
+import { AlertProvider } from '@/hooks/useAlert';
 
 // Lazy loading das páginas
 const Home = lazy(() => import('../pages/Home/Home').then(module => ({ default: module.Home })));
@@ -21,21 +22,25 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <Layout>
-        <Suspense fallback={<LoadingSkeleton />}>
-          <Home />
-        </Suspense>
-      </Layout>
+      <AlertProvider>
+        <Layout>
+          <Suspense fallback={<LoadingSkeleton />}>
+            <Home />
+          </Suspense>
+        </Layout>
+      </AlertProvider>
     ),
   },
   {
     path: "/person/:id",
     element: (
-      <Layout>
-        <Suspense fallback={<div className="container mx-auto p-6"><Skeleton className="h-screen w-full rounded-lg" /></div>}>
-          <PersonDetails />
-        </Suspense>
-      </Layout>
+      <AlertProvider>
+        <Layout>
+          <Suspense fallback={<div className="container mx-auto p-6"><Skeleton className="h-screen w-full rounded-lg" /></div>}>
+            <PersonDetails />
+          </Suspense>
+        </Layout>
+      </AlertProvider>
     ),
   },
 ]);

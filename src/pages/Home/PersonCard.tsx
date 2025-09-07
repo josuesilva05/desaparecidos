@@ -2,10 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCircle, Calendar, MapPin, User } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useImageWithFallback } from '@/hooks/useImageWithFallback';
 import type { PessoaDTO } from '@/types/models';
+import placeholderImage from '@/assets/pessoa_desaparecida.png';
 
 interface PersonCardProps {
   person: PessoaDTO;
@@ -15,22 +14,10 @@ interface PersonCardProps {
 export function PersonCard({ person, loading = false }: PersonCardProps) {
   const navigate = useNavigate();
   
-  // URLs de fallback para caso a imagem principal falhe
-  const fallbackUrls = [
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(person.nome || 'Pessoa')}&size=400&background=e5e7eb&color=374151&format=png`,
-    `https://via.placeholder.com/400x400/e5e7eb/374151?text=${encodeURIComponent(person.nome?.charAt(0) || '?')}`
-  ];
-
-  const {
-    src: currentImageSrc,
-    isLoading: imageLoading,
-    hasError: imageError,
-    onLoad: handleImageLoad,
-    onError: handleImageError,
-  } = useImageWithFallback({
-    src: person.urlFoto,
-    fallbackSrcs: fallbackUrls,
-  });
+  // Simplified image with direct fallback
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = placeholderImage;
+  };
 
   if (loading) {
     return (
@@ -84,40 +71,14 @@ export function PersonCard({ person, loading = false }: PersonCardProps) {
       <div className="relative">
         {/* Imagem da pessoa */}
         <div className="relative h-48 bg-gray-100 overflow-hidden">
-          {currentImageSrc && !imageError ? (
-            <div className="relative w-full h-full">
-              {imageLoading && (
-                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse flex items-center justify-center">
-                  <div className="text-gray-500 text-sm font-medium">Carregando...</div>
-                </div>
-              )}
-              <img
-                src={currentImageSrc}
-                alt={person.nome || 'Pessoa desaparecida'}
-                className={`w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-out ${
-                  imageLoading ? 'opacity-0' : 'opacity-100'
-                }`}
-                onLoad={handleImageLoad}
-                onError={handleImageError}
-                loading="lazy"
-              />
-            </div>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300">
-              <Avatar className="w-24 h-24">
-                <AvatarFallback className="text-2xl bg-gray-300 text-gray-600">
-                  {person.nome?.charAt(0).toUpperCase() || '?'}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-          )}
-
-          {/* Loading skeleton */}
-          {imageLoading && (
-            <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-              <div className="text-gray-400 text-sm">Carregando...</div>
-            </div>
-          )}
+          {/* Direct image with fallback to placeholder */}
+          <img
+            src={person.urlFoto || placeholderImage}
+            alt={person.nome || 'Pessoa desaparecida'}
+            onError={handleImageError}
+            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-out"
+            loading="lazy"
+          />
 
           {/* Badge de status */}
           <div className="absolute top-3 right-3">
