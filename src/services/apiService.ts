@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { environment } from '@/environments/environment';
-import { MockApiService } from './mockApiService';
 import type {
   Permissao,
   OcorrenciaInformacaoDTO,
@@ -22,11 +21,6 @@ const api = axios.create({
   }
 });
 
-// Função helper para decidir se usar mock ou API real
-const shouldUseMock = () => {
-  return 'useMockData' in environment && environment.useMockData;
-};
-
 export const login = async (data: LoginDTO): Promise<Permissao> => {
   const res = await api.post('/login', data);
   return res.data;
@@ -40,10 +34,6 @@ export const refreshToken = async (token: string): Promise<Permissao> => {
 };
 
 export const buscarInformacoes = async (ocorrenciaId: number): Promise<OcorrenciaInformacaoDTO[]> => {
-  if (shouldUseMock()) {
-    return MockApiService.buscarInformacoes(ocorrenciaId);
-  }
-  
   const res = await api.get('/ocorrencias/informacoes-desaparecido', {
     params: { ocorrenciaId }
   });
@@ -165,10 +155,6 @@ export const listarMotivosDesaparecimento = async (): Promise<MotivoDto[]> => {
 };
 
 export const detalhaPessoaDesaparecida = async (id: number): Promise<PessoaDTO> => {
-  if (shouldUseMock()) {
-    return MockApiService.detalhaPessoaDesaparecida(id);
-  }
-  
   const res = await api.get(`/pessoas/${id}`);
   return res.data;
 };
@@ -179,10 +165,6 @@ export const listaUltimasPessoasDesaparecidas = async (
   direcao?: string,
   status?: string
 ): Promise<PagePessoaDTO> => {
-  if (shouldUseMock()) {
-    return MockApiService.listaUltimasPessoasDesaparecidas(pagina, porPagina, direcao, status);
-  }
-  
   const res = await api.get('/pessoas/aberto', {
     params: { pagina, porPagina, direcao, status }
   });
@@ -198,12 +180,6 @@ export const listaPessoasDesaparecidasPeloFiltro = async (
   porPagina?: number,
   status?: string
 ): Promise<PagePessoaDTO> => {
-  if (shouldUseMock()) {
-    return MockApiService.listaPessoasDesaparecidasPeloFiltro(
-      nome, faixaIdadeInicial, faixaIdadeFinal, sexo, pagina, porPagina, status
-    );
-  }
-  
   const res = await api.get('/pessoas/aberto/filtro', {
     params: { nome, faixaIdadeInicial, faixaIdadeFinal, sexo, pagina, porPagina, status }
   });
@@ -211,19 +187,11 @@ export const listaPessoasDesaparecidasPeloFiltro = async (
 };
 
 export const quantidadePessoasDesaparecidasLocalizadas = async (): Promise<EstatisticaPessoaDTO> => {
-  if (shouldUseMock()) {
-    return MockApiService.quantidadePessoasDesaparecidasLocalizadas();
-  }
-  
   const res = await api.get('/pessoas/aberto/estatistico');
   return res.data;
 };
 
 export const pessoasDesaparecidasRandomico = async (registros?: number): Promise<PessoaDTO[]> => {
-  if (shouldUseMock()) {
-    return MockApiService.pessoasDesaparecidasRandomico(registros);
-  }
-  
   const res = await api.get('/pessoas/aberto/dinamico', {
     params: { registros }
   });

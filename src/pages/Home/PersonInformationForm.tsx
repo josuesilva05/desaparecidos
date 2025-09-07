@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { X, Camera, Calendar, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { environment } from '@/environments/environment';
 import { adicionarInformacoes } from '@/services/apiService';
 
 interface PersonInformationFormProps {
@@ -78,28 +77,17 @@ export function PersonInformationForm({ personName, onClose, onSubmit, ocorrenci
     setSubmitError('');
 
     try {
-      // Função helper para decidir se usar mock ou API real
-      const shouldUseMock = () => {
-        return 'useMockData' in environment && environment.useMockData;
-      };
+      // Enviar para a API real
+      await adicionarInformacoes(
+        formData.informacao.trim(),
+        formData.descricao.trim(),  
+        formData.data,
+        ocorrenciaId,
+        formData.fotos.length > 0 ? formData.fotos : undefined
+      );
 
-      if (shouldUseMock()) {
-        // Ambiente de desenvolvimento/mock
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        alert('Informação enviada com sucesso! Obrigado por ajudar.');
-      } else {
-        // Enviar para a API real
-        await adicionarInformacoes(
-          formData.informacao.trim(),
-          formData.descricao.trim(),  
-          formData.data,
-          ocorrenciaId,
-          formData.fotos.length > 0 ? formData.fotos : undefined
-        );
-
-        alert('Informação enviada com sucesso! Suas informações foram registradas e serão analisadas pelas autoridades competentes.');
-      }
-
+      alert('Informação enviada com sucesso! Suas informações foram registradas e serão analisadas pelas autoridades competentes.');
+      
       onSubmit(formData);
     } catch (error) {
       console.error('Erro ao enviar informação:', error);
