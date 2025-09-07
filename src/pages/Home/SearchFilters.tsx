@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Search, Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from './ui/input';
+import { Input } from '../../components/ui/input';
 
 export interface SearchFilters {
   nome?: string;

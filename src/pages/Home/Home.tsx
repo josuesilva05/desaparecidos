@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AlertTriangle, Heart, Search as SearchIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { PersonCard } from '@/components/PersonCard';
-import { SearchFiltersComponent } from '@/components/SearchFilters';
-import { Pagination } from '@/components/Pagination';
-import { StatisticsCards } from '@/components/StatisticsCards';
+import { PersonCard } from '@/pages/Home/PersonCard';
+import { SearchFiltersComponent } from '@/pages/Home/SearchFilters';
+import { Pagination } from '@/pages/Home/Pagination';
+import { StatisticsCards } from '@/pages/Home/StatisticsCards';
 import { 
   listaUltimasPessoasDesaparecidas, 
   listaPessoasDesaparecidasPeloFiltro 
 } from '@/services/apiService';
 import type { PagePessoaDTO, PessoaDTO } from '@/types/models';
-import type { SearchFilters } from '@/components/SearchFilters';
+import type { SearchFilters } from '@/pages/Home/SearchFilters';
 
 const ITEMS_PER_PAGE = 10;
 
