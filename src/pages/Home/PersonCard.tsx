@@ -40,9 +40,8 @@ export function PersonCard({ person, loading = false }: PersonCardProps) {
     );
   }
 
-  const isDesaparecido = person.ultimaOcorrencia?.encontradoVivo === undefined || 
-                         person.ultimaOcorrencia?.encontradoVivo === null ||
-                         !person.ultimaOcorrencia?.dataLocalizacao;
+  // Considera como desaparecido somente se não houve data de localização
+  const isDesaparecido = !person.ultimaOcorrencia?.dataLocalizacao;
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'N/A';
@@ -70,7 +69,7 @@ export function PersonCard({ person, loading = false }: PersonCardProps) {
     >
       <div className="relative">
         {/* Imagem da pessoa */}
-        <div className="relative h-48 bg-gray-100 overflow-hidden">
+        <div className="relative h-48 bg-gray-100 dark:bg-gray-800 overflow-hidden">
           {/* Direct image with fallback to placeholder */}
           <img
             src={person.urlFoto || placeholderImage}
@@ -86,8 +85,8 @@ export function PersonCard({ person, loading = false }: PersonCardProps) {
               variant={isDesaparecido ? "destructive" : "default"}
               className={`text-xs font-medium shadow-lg ${
                 isDesaparecido 
-                  ? 'bg-red-100 text-red-800 border-red-200' 
-                  : 'bg-green-100 text-green-800 border-green-200'
+                  ? 'bg-red-100 text-red-800 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800' 
+                  : 'bg-green-100 text-green-800 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800'
               }`}
             >
               {isDesaparecido ? (
@@ -110,10 +109,10 @@ export function PersonCard({ person, loading = false }: PersonCardProps) {
           <div className="space-y-3">
             {/* Nome */}
             <div>
-              <h3 className="font-semibold text-lg text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+              <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                 {person.nome || 'Nome não informado'}
               </h3>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                 <User className="h-3 w-3" />
                 <span>{person.idade ? `${person.idade} anos` : 'Idade não informada'}</span>
                 <span>•</span>
@@ -124,12 +123,12 @@ export function PersonCard({ person, loading = false }: PersonCardProps) {
             {/* Informações da ocorrência */}
             <div className="space-y-2 text-sm">
               <div className="flex items-start gap-2">
-                <Calendar className="h-3 w-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                <Calendar className="h-3 w-3 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <span className="text-gray-500">
+                  <span className="text-gray-500 dark:text-gray-400">
                     {isDesaparecido ? 'Desapareceu em: ' : 'Localizado em: '}
                   </span>
-                  <span className="font-medium text-gray-700">
+                  <span className="font-medium text-gray-700 dark:text-gray-300">
                     {isDesaparecido 
                       ? formatDate(person.ultimaOcorrencia?.dtDesaparecimento)
                       : formatDate(person.ultimaOcorrencia?.dataLocalizacao)
@@ -140,8 +139,8 @@ export function PersonCard({ person, loading = false }: PersonCardProps) {
 
               {person.ultimaOcorrencia?.localDesaparecimentoConcat && (
                 <div className="flex items-start gap-2">
-                  <MapPin className="h-3 w-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-600 line-clamp-2 text-xs">
+                  <MapPin className="h-3 w-3 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-gray-600 dark:text-gray-400 line-clamp-2 text-xs">
                     {person.ultimaOcorrencia.localDesaparecimentoConcat}
                   </span>
                 </div>
@@ -150,8 +149,8 @@ export function PersonCard({ person, loading = false }: PersonCardProps) {
 
             {/* Informação adicional se disponível */}
             {person.ultimaOcorrencia?.ocorrenciaEntrevDesapDTO?.informacao && (
-              <div className="pt-2 border-t border-gray-100">
-                <p className="text-xs text-gray-600 line-clamp-2">
+              <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
                   {person.ultimaOcorrencia.ocorrenciaEntrevDesapDTO.informacao}
                 </p>
               </div>

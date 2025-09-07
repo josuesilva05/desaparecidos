@@ -127,7 +127,7 @@ export function StatisticsCards() {
   return (
     <div className="mb-6">
       <div className="@container grow w-full">
-        <div className="grid grid-cols-1 @3xl:grid-cols-3 bg-background overflow-hidden rounded-xl border border-gray-300">
+        <div className="grid grid-cols-1 @3xl:grid-cols-3 bg-background overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600">
           {cards.map((card, i) => (
             <Card
               key={i}

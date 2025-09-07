@@ -61,11 +61,11 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
       {/* Busca principal */}
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-black-500 h-5 w-5" />
           <Input      
             type="text"
             placeholder="Buscar por nome..."
-            className="w-full pl-10 pr-4 py-6 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+            className="w-full pl-10 pr-4 py-6 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             value={searchValue}
             onChange={(e) => handleSearchInputChange(e.target.value)}
             onKeyPress={handleKeyPress}
@@ -74,9 +74,10 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
         </div>
         <Button
           onClick={handleSearchSubmit}
+          variant={'outline'}
           disabled={loading}
           size="lg"
-          className="px-6 py-6 text-white"
+          className="px-6 py-6"
         >
           <Search className="h-5 w-5 mr-2" />
           Buscar
@@ -93,8 +94,8 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
             disabled={loading}
             className={`${
               filters.status === 'DESAPARECIDO' 
-                ? 'bg-red-600 hover:bg-red-700 text-white' 
-                : 'hover:bg-red-50 hover:text-red-600'
+                ? 'bg-red-600 hover:bg-red-700 text-white dark:bg-red-700 dark:hover:bg-red-800' 
+                : 'hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-400 dark:border-gray-600'
             }`}
           >
             Desaparecidos
@@ -107,8 +108,8 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
             disabled={loading}
             className={`${
               filters.status === 'LOCALIZADO' 
-                ? 'bg-green-600 hover:bg-green-700 text-white' 
-                : 'hover:bg-green-50 hover:text-green-600'
+                ? 'bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-800' 
+                : 'hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-950 dark:hover:text-green-400 dark:border-gray-600'
             }`}
           >
             Localizados
@@ -119,7 +120,7 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
             size="lg"
             onClick={() => setShowAdvanced(!showAdvanced)}
             disabled={loading}
-            className="hover:bg-gray-50"
+            className="hover:bg-gray-50 dark:hover:bg-gray-800 dark:border-gray-600"
           >
             <Filter className="mr-2 h-4 w-4" />
             Filtros avançados
@@ -131,7 +132,7 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
               size="lg"
               onClick={clearFilters}
               disabled={loading}
-              className="hover:bg-gray-50 text-red-600 hover:text-red-700"
+              className="hover:bg-gray-50 text-red-600 hover:text-red-700 dark:hover:bg-gray-800 dark:text-red-400 dark:hover:text-red-300 dark:border-gray-600"
             >
               <X className="mr-2 h-4 w-4" />
               Limpar
@@ -147,7 +148,7 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Faixa etária */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Idade mínima
                 </label>
                 <input
@@ -155,7 +156,7 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
                   min="0"
                   max="120"
                   placeholder="Ex: 18"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   value={filters.faixaIdadeInicial || ''}
                   onChange={(e) => handleFilterChange('faixaIdadeInicial', e.target.value ? parseInt(e.target.value) : undefined)}
                   disabled={loading}
@@ -163,7 +164,7 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Idade máxima
                 </label>
                 <input
@@ -171,7 +172,7 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
                   min="0"
                   max="120"
                   placeholder="Ex: 65"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   value={filters.faixaIdadeFinal || ''}
                   onChange={(e) => handleFilterChange('faixaIdadeFinal', e.target.value ? parseInt(e.target.value) : undefined)}
                   disabled={loading}
@@ -180,11 +181,11 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
 
               {/* Sexo */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Sexo
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   value={filters.sexo || ''}
                   onChange={(e) => handleFilterChange('sexo', e.target.value || undefined)}
                   disabled={loading}
@@ -196,7 +197,7 @@ export function SearchFiltersComponent({ onFiltersChange, loading = false }: Sea
               </div>
             </div>
 
-            <div className="mt-4 text-sm text-gray-600">
+            <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
               <p>
                 Use os filtros acima para refinar sua busca. 
                 {hasActiveFilters && ' Filtros ativos são exibidos com destaque.'}
