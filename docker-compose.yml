@@ -1,0 +1,7 @@
+services:
+  desaparecidos:
+    build: .
+    container_name: desaparecidos
+    ports:
+      - "8080:80"
+    restart: unless-stopped
