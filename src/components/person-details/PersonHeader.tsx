@@ -2,7 +2,7 @@ import { ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { PersonInformationForm } from "@/components/home/PersonInformationForm";
+import { PersonInformationForm } from "@/components/person-details/PersonInformationForm";
 import type { PessoaDTO } from "@/types/models";
 
 interface PersonHeaderProps {

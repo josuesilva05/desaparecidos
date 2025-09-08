@@ -7,7 +7,6 @@ import {
   PaginationPrevious, 
   PaginationEllipsis 
 } from '@/components/ui/pagination';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface PaginationProps {
   currentPage: number;
@@ -34,9 +33,6 @@ export function Pagination({
           Mostrando <span className="font-medium">{Math.min(totalElements, pageSize)}</span> de{' '}
           <span className="font-medium">{totalElements}</span> resultados
         </div>
-
-        {/* Theme toggle à direita */}
-        <ThemeToggle />
       </div>
     );
   }

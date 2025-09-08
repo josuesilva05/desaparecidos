@@ -30,7 +30,7 @@ export function ImageModal({ selectedImage, onClose }: ImageModalProps) {
     <Dialog open={!!selectedImage} onOpenChange={() => onClose()}>
       <DialogContent className="max-w-[95vw] max-h-[95vh] p-5">
         <DialogHeader>
-          <DialogTitle>Visualização de Imagem</DialogTitle>
+          <DialogTitle>Visualização da Imagem</DialogTitle>
         </DialogHeader>
         <div className="flex justify-center items-center h-full">
           <img

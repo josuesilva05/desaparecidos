@@ -15,8 +15,7 @@ export const Footer: React.FC = () => {
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Se você tem informações sobre alguma pessoa desaparecida, entre
-            em contato através da página de detalhes ou pelos telefones de
-            emergência: <strong>190</strong> ou <strong>197</strong>
+            em contato: <strong>(65) 3901-4839 (1ª DP - CENTRO DE CUIABÁ)</strong>
           </p>
         </div>
       </div>

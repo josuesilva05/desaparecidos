@@ -35,9 +35,18 @@ export function SearchFiltersComponent({
   const [filters, setFilters] = useState<SearchFilters>({});
   const [searchValue, setSearchValue] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [localIdadeMinima, setLocalIdadeMinima] = useState<string>("");
+  const [localIdadeMaxima, setLocalIdadeMaxima] = useState<string>("");
+  const [localSexo, setLocalSexo] = useState<string>("");
 
   const handleSearchSubmit = () => {
-    const newFilters = { ...filters, nome: searchValue || undefined };
+    const newFilters = { 
+      ...filters, 
+      nome: searchValue || undefined,
+      faixaIdadeInicial: localIdadeMinima ? parseInt(localIdadeMinima) : undefined,
+      faixaIdadeFinal: localIdadeMaxima ? parseInt(localIdadeMaxima) : undefined,
+      sexo: localSexo === "ALL" || !localSexo ? undefined : localSexo
+    };
     setFilters(newFilters);
     onFiltersChange(newFilters);
   };
@@ -52,19 +61,38 @@ export function SearchFiltersComponent({
     }
   };
 
-  const handleFilterChange = (
-    key: keyof SearchFilters,
-    value: string | number | undefined
+  const handleStatusFilterChange = (
+    value: string | undefined
   ) => {
-    const newFilters = { ...filters, [key]: value };
+    const newFilters = { ...filters, status: value };
     setFilters(newFilters);
-    onFiltersChange(newFilters); // Dispara a busca automaticamente para filtros avançados
+    onFiltersChange(newFilters); // Dispara a busca automaticamente apenas para status
+  };
+
+  const handleAgeFilterChange = (
+    field: 'minima' | 'maxima',
+    value: string
+  ) => {
+    if (field === 'minima') {
+      setLocalIdadeMinima(value);
+    } else {
+      setLocalIdadeMaxima(value);
+    }
+    // Não dispara a busca automaticamente para idade
+  };
+
+  const handleSexoFilterChange = (value: string) => {
+    setLocalSexo(value);
+    // Não dispara a busca automaticamente para sexo
   };
 
   const clearFilters = () => {
     const emptyFilters = {};
     setFilters(emptyFilters);
     setSearchValue("");
+    setLocalIdadeMinima("");
+    setLocalIdadeMaxima("");
+    setLocalSexo("");
     onFiltersChange(emptyFilters);
     setShowAdvanced(false);
   };
@@ -119,6 +147,21 @@ export function SearchFiltersComponent({
       const newFilters = { ...filters, nome: undefined };
       setFilters(newFilters);
       onFiltersChange(newFilters);
+    } else if (filterKey === "faixaIdadeInicial") {
+      setLocalIdadeMinima("");
+      const newFilters = { ...filters, faixaIdadeInicial: undefined };
+      setFilters(newFilters);
+      onFiltersChange(newFilters);
+    } else if (filterKey === "faixaIdadeFinal") {
+      setLocalIdadeMaxima("");
+      const newFilters = { ...filters, faixaIdadeFinal: undefined };
+      setFilters(newFilters);
+      onFiltersChange(newFilters);
+    } else if (filterKey === "sexo") {
+      setLocalSexo("");
+      const newFilters = { ...filters, sexo: undefined };
+      setFilters(newFilters);
+      onFiltersChange(newFilters);
     } else {
       const newFilters = { ...filters, [filterKey]: undefined };
       setFilters(newFilters);
@@ -169,23 +212,15 @@ export function SearchFiltersComponent({
       </div>
 
       {/* Filtros rápidos */}
-      <div className="flex flex-wrap gap-2 justify-between">
-
-        {/* Theme toggle à direita */}
-        <div className="flex order-3 justify-center lg:justify-end">
-          <ThemeToggle />
-        </div>
-
-        <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-between items-start sm:items-center">
+        <div className="flex flex-wrap gap-2 order-2 sm:order-1 w-full sm:w-auto">
           <Button
             variant={filters.status === "DESAPARECIDO" ? "default" : "outline"}
             size="lg"
             onClick={() => {
               const newStatus =
                 filters.status === "DESAPARECIDO" ? undefined : "DESAPARECIDO";
-              const newFilters = { ...filters, status: newStatus };
-              setFilters(newFilters);
-              onFiltersChange(newFilters); // Dispara a busca automaticamente
+              handleStatusFilterChange(newStatus);
             }}
             disabled={loading}
             className={`transition-all duration-200 ${
@@ -204,9 +239,7 @@ export function SearchFiltersComponent({
             onClick={() => {
               const newStatus =
                 filters.status === "LOCALIZADO" ? undefined : "LOCALIZADO";
-              const newFilters = { ...filters, status: newStatus };
-              setFilters(newFilters);
-              onFiltersChange(newFilters); // Dispara a busca automaticamente
+              handleStatusFilterChange(newStatus);
             }}
             disabled={loading}
             className={`transition-all duration-200 ${
@@ -227,7 +260,8 @@ export function SearchFiltersComponent({
             className={`transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 dark:border-gray-600 ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
           >
             <Filter className="mr-2 h-4 w-4" />
-            Filtros avançados
+            <span className="hidden sm:inline">Filtros avançados</span>
+            <span className="sm:hidden">Filtros</span>
           </Button>
 
           {hasActiveFilters && (
@@ -242,6 +276,11 @@ export function SearchFiltersComponent({
               Limpar
             </Button>
           )}
+        </div>
+
+        {/* Theme toggle responsivo */}
+        <div className="flex justify-center sm:justify-end order-1 sm:order-2 w-full sm:w-auto mb-2 sm:mb-0">
+          <ThemeToggle />
         </div>
       </div>
 
@@ -285,13 +324,8 @@ export function SearchFiltersComponent({
                   min="0"
                   max="120"
                   placeholder="Ex: 18"
-                  value={filters.faixaIdadeInicial || ""}
-                  onChange={(e) =>
-                    handleFilterChange(
-                      "faixaIdadeInicial",
-                      e.target.value ? parseInt(e.target.value) : undefined
-                    )
-                  }
+                  value={localIdadeMinima}
+                  onChange={(e) => handleAgeFilterChange('minima', e.target.value)}
                   disabled={loading}
                 />
               </div>
@@ -304,13 +338,8 @@ export function SearchFiltersComponent({
                   min="0"
                   max="120"
                   placeholder="Ex: 65"
-                  value={filters.faixaIdadeFinal || ""}
-                  onChange={(e) =>
-                    handleFilterChange(
-                      "faixaIdadeFinal",
-                      e.target.value ? parseInt(e.target.value) : undefined
-                    )
-                  }
+                  value={localIdadeMaxima}
+                  onChange={(e) => handleAgeFilterChange('maxima', e.target.value)}
                   disabled={loading}
                 />
               </div>
@@ -319,13 +348,8 @@ export function SearchFiltersComponent({
               <div className="space-y-2">
                 <Label htmlFor="sexo">Sexo</Label>
                 <Select
-                  value={filters.sexo}
-                  onValueChange={(value) =>
-                    handleFilterChange(
-                      "sexo",
-                      value === "ALL" ? undefined : value
-                    )
-                  }
+                  value={localSexo || "ALL"}
+                  onValueChange={handleSexoFilterChange}
                   disabled={loading}
                 >
                   <SelectTrigger className="w-full">
@@ -342,12 +366,27 @@ export function SearchFiltersComponent({
 
             <Separator className="my-4" />
 
-            <div className="text-sm text-muted-foreground">
-              <p>
-                Use os filtros acima para refinar sua busca. A busca é feita automaticamente quando você altera um filtro.
-                {hasActiveFilters &&
-                  " Filtros ativos são exibidos com destaque."}
-              </p>
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                <p>
+                  Use os filtros acima para refinar sua busca.
+                  {hasActiveFilters &&
+                    " Filtros ativos são exibidos com destaque."}
+                </p>
+              </div>
+
+              <Button
+                onClick={handleSearchSubmit}
+                disabled={loading}
+                className="whitespace-nowrap"
+              >
+                {loading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                ) : (
+                  <Search className="h-4 w-4 mr-2" />
+                )}
+                {loading ? 'Aplicando...' : 'Aplicar Filtros'}
+              </Button>
             </div>
           </CardContent>
         </Card>
