@@ -162,10 +162,7 @@ export function Pagination({
         </UIPagination>
       </div>
 
-      {/* Theme toggle à direita */}
-      <div className="order-3">
-        <ThemeToggle />
-      </div>
+
     </div>
   );
 }

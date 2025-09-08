@@ -21,19 +21,56 @@ export function PersonCard({ person, loading = false }: PersonCardProps) {
 
   if (loading) {
     return (
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden bg-white dark:bg-[#0c0d18] border border-gray-200 dark:border-gray-700 transition-all duration-200">
         <div className="relative">
-          <Skeleton className="w-full h-48" />
-          <div className="absolute top-3 right-3">
-            <Skeleton className="h-6 w-20 rounded-full" />
+          {/* Skeleton da imagem */}
+          <div className="relative h-48 bg-gray-100 dark:bg-gray-800 overflow-hidden">
+            <Skeleton variant="shimmer" className="w-full h-full" />
+            
+            {/* Badge skeleton */}
+            <div className="absolute top-3 right-3">
+              <Skeleton variant="shimmer" className="h-6 w-24 rounded-full" />
+            </div>
           </div>
         </div>
+        
         <CardContent className="p-4">
-          <Skeleton className="h-6 w-3/4 mb-2" />
-          <Skeleton className="h-4 w-1/2 mb-3" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-2/3" />
+          <div className="space-y-3">
+            {/* Nome e informações básicas */}
+            <div className="space-y-2">
+              <Skeleton variant="shimmer" className="h-6 w-3/4" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-3 w-3 rounded-full" />
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-1 w-1 rounded-full" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+            </div>
+
+            {/* Informações da ocorrência */}
+            <div className="space-y-3">
+              <div className="flex items-start gap-2">
+                <Skeleton className="h-3 w-3 rounded-full mt-0.5 flex-shrink-0" />
+                <div className="flex-1 space-y-1">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton variant="shimmer" className="h-4 w-2/3" />
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-2">
+                <Skeleton className="h-3 w-3 rounded-full mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-4/5 mt-1" />
+                </div>
+              </div>
+            </div>
+
+            {/* Informação adicional skeleton */}
+            <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-3/5 mt-1" />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -64,7 +101,7 @@ export function PersonCard({ person, loading = false }: PersonCardProps) {
 
   return (
     <Card 
-      className="overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] group"
+      className="overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] group bg-white dark:bg-[#0c0d18] border border-gray-200 dark:border-gray-700"
       onClick={handleClick}
     >
       <div className="relative">

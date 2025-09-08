@@ -31,20 +31,30 @@ export function StatisticsCards() {
   if (loading) {
     return (
       <div className="@container grow w-full mb-6">
-        <div className="grid grid-cols-1 @3xl:grid-cols-3 bg-background overflow-hidden rounded-xl border border-border">
+        <div className="grid grid-cols-1 @3xl:grid-cols-3 bg-white dark:bg-[#0c0d18] overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600">
           {Array.from({ length: 3 }).map((_, index) => (
-            <Card key={index} className="border-0 shadow-none rounded-none border-y @3xl:border-x @3xl:border-y-0 border-border last:border-0 first:border-0">
-              <CardContent className="flex flex-col h-full space-y-3 justify-between py-4">
-                <div className="space-y-0.5">
-                  <Skeleton className="h-5 w-32" />
-                  <Skeleton className="h-4 w-24" />
+            <Card key={index} className="border-0 shadow-none rounded-none border-y @3xl:border-x @3xl:border-y-0 border-border last:border-0 first:border-0 bg-transparent">
+              <CardContent className="flex flex-col h-full space-y-4 justify-between py-6 px-6">
+                {/* Título e subtítulo */}
+                <div className="space-y-2">
+                  <Skeleton variant="shimmer" className="h-7 w-40" />
+                  <Skeleton className="h-4 w-32" />
                 </div>
-                <div className="flex-1 flex flex-col gap-1.5 justify-between grow">
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-9 w-20" />
-                    <Skeleton className="h-6 w-12 rounded-full" />
+                
+                {/* Área do valor e badge */}
+                <div className="flex-1 flex flex-col gap-3 justify-between grow">
+                  <div className="flex items-center gap-3">
+                    <Skeleton variant="shimmer" className="h-9 w-24" />
+                    <div className="flex items-center gap-1">
+                      <Skeleton className="h-3 w-3 rounded-full" />
+                      <Skeleton className="h-6 w-12 rounded-full" />
+                    </div>
                   </div>
-                  <Skeleton className="h-4 w-28" />
+                  
+                  {/* Linha de progresso simulada */}
+                  <div className="w-full">
+                    <Skeleton className="h-2 w-full rounded-full" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -57,7 +67,7 @@ export function StatisticsCards() {
   if (error || !statistics) {
     return (
       <div className="mb-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#0c0d18] border border-gray-200 dark:border-gray-700">
           <CardContent className="p-6 text-center">
             <p className="text-muted-foreground">{error || 'Não foi possível carregar as estatísticas'}</p>
           </CardContent>
@@ -127,11 +137,11 @@ export function StatisticsCards() {
   return (
     <div className="mb-6">
       <div className="@container grow w-full">
-        <div className="grid grid-cols-1 @3xl:grid-cols-3 bg-background overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600">
+        <div className="grid grid-cols-1 @3xl:grid-cols-3 bg-white dark:bg-[#0c0d18] overflow-hidden rounded-xl border border-gray-300 dark:border-gray-600">
           {cards.map((card, i) => (
             <Card
               key={i}
-              className="border-0 shadow-none rounded-none border-y @3xl:border-x @3xl:border-y-0 border-border last:border-0 first:border-0"
+              className="border-0 shadow-none rounded-none border-y @3xl:border-x @3xl:border-y-0 border-gray-300 dark:border-gray-600 last:border-0 first:border-0 bg-transparent"
             >
               <CardContent className="flex flex-col h-full space-y-3 justify-between py-4 px-6">
                 {/* Title & Subtitle */}
