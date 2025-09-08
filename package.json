@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "docker compose up -d --build",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "deploy": "docker-compose up -d --build"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
