@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Header } from './Header';
 import { Footer } from './Footer';
 
@@ -11,7 +11,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
       <main className="flex-1">
-        {children}
+        <Suspense fallback={<div>Carregando...</div>}>
+          {children}
+        </Suspense>
       </main>
       <Footer />
     </div>
