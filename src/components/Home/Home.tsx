@@ -31,8 +31,7 @@ export const Home = () => {
         setError(null);
 
         let response: PagePessoaDTO;
-
-        // Verifica se há filtros ativos
+        
         const hasFilters = Object.values(searchFilters).some(
           (value) => value !== undefined && value !== "" && value !== null
         );
@@ -127,26 +126,6 @@ export const Home = () => {
 
         {/* Conteúdo principal */}
         <div className="container mx-auto px-6 py-8">
-          {/* Botões de teste dos alertas - REMOVER EM PRODUÇÃO */}
-          {/* <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <h3 className="text-sm font-medium text-yellow-800 mb-3">Teste dos Alertas (Dev)</h3>
-          <div className="flex gap-3">
-            <Button
-              onClick={() => success('Teste de alerta de sucesso! Tudo funcionando perfeitamente.')}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              Testar Sucesso
-            </Button>
-            <Button
-              onClick={() => showError('Teste de alerta de erro! Algo deu errado.')}
-              variant="destructive"
-            >
-              Testar Erro
-            </Button>
-          </div>
-        </div> */}
-
-          {/* Mensagens de estado */}
           {error && (
             <Card className="mb-6 border-red-200 bg-red-50 dark:border-red-800 dark:bg-[#0c0d18]">
               <CardContent className="p-6">
@@ -286,7 +265,6 @@ export const Home = () => {
             )
           )}
         </div>
-        
       </div>
     </div>
   );

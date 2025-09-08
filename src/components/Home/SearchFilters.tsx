@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Search, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "../../components/ui/input";
+import { Input } from "../ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -58,7 +58,7 @@ export function SearchFiltersComponent({
   ) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
-    // Removido: onFiltersChange(newFilters); - agora só aplica no botão buscar
+    onFiltersChange(newFilters); // Dispara a busca automaticamente para filtros avançados
   };
 
   const clearFilters = () => {
@@ -183,7 +183,9 @@ export function SearchFiltersComponent({
             onClick={() => {
               const newStatus =
                 filters.status === "DESAPARECIDO" ? undefined : "DESAPARECIDO";
-              setFilters((prev) => ({ ...prev, status: newStatus }));
+              const newFilters = { ...filters, status: newStatus };
+              setFilters(newFilters);
+              onFiltersChange(newFilters); // Dispara a busca automaticamente
             }}
             disabled={loading}
             className={`transition-all duration-200 ${
@@ -202,7 +204,9 @@ export function SearchFiltersComponent({
             onClick={() => {
               const newStatus =
                 filters.status === "LOCALIZADO" ? undefined : "LOCALIZADO";
-              setFilters((prev) => ({ ...prev, status: newStatus }));
+              const newFilters = { ...filters, status: newStatus };
+              setFilters(newFilters);
+              onFiltersChange(newFilters); // Dispara a busca automaticamente
             }}
             disabled={loading}
             className={`transition-all duration-200 ${
@@ -340,7 +344,7 @@ export function SearchFiltersComponent({
 
             <div className="text-sm text-muted-foreground">
               <p>
-                Use os filtros acima para refinar sua busca.
+                Use os filtros acima para refinar sua busca. A busca é feita automaticamente quando você altera um filtro.
                 {hasActiveFilters &&
                   " Filtros ativos são exibidos com destaque."}
               </p>

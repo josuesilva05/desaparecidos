@@ -95,7 +95,7 @@ export function PersonCard({ person, loading = false }: PersonCardProps) {
 
   const handleClick = () => {
     if (person.id) {
-      navigate(`/person/${person.id}`);
+      navigate(`/detalhes-pessoa/${person.id}`);
     }
   };
 
