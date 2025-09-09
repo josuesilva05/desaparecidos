@@ -5,6 +5,7 @@ import { AlertProvider } from '@/hooks/useAlert';
 
 const Home = lazy(() => import('../components/home/Home').then(module => ({ default: module.Home })));
 const PersonDetails = lazy(() => import('../components/person-details/PersonDetails'));
+const NotFound = lazy(() => import('../components/error/NotFound'));
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,16 @@ const router = createBrowserRouter([
       <AlertProvider>
         <Layout>
             <PersonDetails />
+        </Layout>
+      </AlertProvider>
+    ),
+  },
+  {
+    path: "*",
+    element: (
+      <AlertProvider>
+        <Layout>
+            <NotFound />
         </Layout>
       </AlertProvider>
     ),
