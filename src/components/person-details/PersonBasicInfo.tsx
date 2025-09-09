@@ -1,5 +1,5 @@
 import { User, Calendar, MapPin, CheckCircle } from "lucide-react";
-import placeholderImage from '@/assets/pessoa_desaparecida.png';
+import placeholderImage from "@/assets/pessoa_desaparecida.png";
 import { Card, CardContent } from "@/components/ui/card";
 import type { PessoaDTO } from "@/types/models";
 
@@ -8,7 +8,10 @@ interface PersonBasicInfoProps {
   onImageClick: (imageUrl: string | null) => void;
 }
 
-export function PersonBasicInfo({ person, onImageClick }: PersonBasicInfoProps) {
+export function PersonBasicInfo({
+  person,
+  onImageClick,
+}: PersonBasicInfoProps) {
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("pt-BR");
@@ -63,12 +66,11 @@ export function PersonBasicInfo({ person, onImageClick }: PersonBasicInfoProps) 
     <Card className="flex-shrink-0 bg-white dark:bg-[#0c0d18] border border-gray-200 dark:border-gray-700">
       <CardContent className="p-6">
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Imagem principal */}
           <div className="flex-shrink-0">
             <div className="w-72 h-80 mx-auto md:mx-0 rounded-lg overflow-hidden shadow-md">
               <img
                 src={person.urlFoto || placeholderImage}
-                alt={person.nome || 'Pessoa desaparecida'}
+                alt={person.nome || "Pessoa desaparecida"}
                 className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
                 onClick={() => onImageClick(person.urlFoto || null)}
                 onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
@@ -78,7 +80,6 @@ export function PersonBasicInfo({ person, onImageClick }: PersonBasicInfoProps) 
             </div>
           </div>
 
-          {/* Informações ao lado da imagem */}
           <div className="flex-1 flex flex-col justify-center space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               <div className="space-y-1">

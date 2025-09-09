@@ -4,7 +4,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function PersonDetailsLoading() {
   return (
     <div className="min-h-screen w-full bg-[#faf9f6] dark:bg-gray-900 relative">
-      {/* Paper Texture */}
       <div
         className="absolute inset-0 z-0"
         style={{
@@ -12,7 +11,6 @@ export function PersonDetailsLoading() {
           backgroundSize: "8px 8px",
         }}
       />
-      {/* Dark mode texture overlay */}
       <div
         className="absolute inset-0 z-0 dark:block hidden"
         style={{
@@ -20,29 +18,21 @@ export function PersonDetailsLoading() {
           backgroundSize: "8px 8px",
         }}
       />
-      
+
       <div className="relative z-10 container mx-auto p-6">
         <div className="space-y-6">
-          {/* Header skeleton */}
           <div className="flex items-center gap-4">
             <Skeleton className="h-10 w-24 rounded-md" />
             <Skeleton variant="shimmer" className="h-8 w-48" />
           </div>
-
-          {/* Main content skeleton */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left column - Main info */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Image and basic info card */}
               <Card className="bg-white dark:bg-[#0c0d18] border border-gray-200 dark:border-gray-700">
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row gap-6">
-                    {/* Image skeleton */}
                     <div className="md:w-64 md:h-64 w-full h-48 rounded-lg overflow-hidden">
                       <Skeleton variant="shimmer" className="w-full h-full" />
                     </div>
-                    
-                    {/* Info skeleton */}
                     <div className="flex-1 space-y-4">
                       <div className="space-y-2">
                         <Skeleton variant="shimmer" className="h-8 w-3/4" />
@@ -50,7 +40,6 @@ export function PersonDetailsLoading() {
                           <Skeleton className="h-6 w-20 rounded-full" />
                         </div>
                       </div>
-                      
                       <div className="space-y-3">
                         {Array.from({ length: 4 }).map((_, i) => (
                           <div key={i} className="flex items-center gap-3">
@@ -65,7 +54,6 @@ export function PersonDetailsLoading() {
                 </CardContent>
               </Card>
 
-              {/* Description card skeleton */}
               <Card className="bg-white dark:bg-[#0c0d18] border border-gray-200 dark:border-gray-700">
                 <CardHeader>
                   <Skeleton className="h-6 w-40" />
@@ -81,9 +69,7 @@ export function PersonDetailsLoading() {
               </Card>
             </div>
 
-            {/* Right column - Additional info */}
             <div className="space-y-6">
-              {/* Location card skeleton */}
               <Card className="bg-white dark:bg-[#0c0d18] border border-gray-200 dark:border-gray-700">
                 <CardHeader>
                   <Skeleton className="h-6 w-32" />
@@ -105,7 +91,6 @@ export function PersonDetailsLoading() {
                 </CardContent>
               </Card>
 
-              {/* Contact card skeleton */}
               <Card className="bg-white dark:bg-[#0c0d18] border border-gray-200 dark:border-gray-700">
                 <CardHeader>
                   <Skeleton className="h-6 w-36" />
@@ -121,7 +106,6 @@ export function PersonDetailsLoading() {
                 </CardContent>
               </Card>
 
-              {/* Information list skeleton */}
               <Card className="bg-white dark:bg-[#0c0d18] border border-gray-200 dark:border-gray-700">
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -132,7 +116,10 @@ export function PersonDetailsLoading() {
                 <CardContent>
                   <div className="space-y-4">
                     {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
+                      <div
+                        key={i}
+                        className="p-3 border border-gray-200 dark:border-gray-600 rounded-lg"
+                      >
                         <div className="space-y-2">
                           <div className="flex justify-between items-center">
                             <Skeleton className="h-4 w-24" />

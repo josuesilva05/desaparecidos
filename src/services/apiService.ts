@@ -3,8 +3,6 @@ import { environment } from '@/environments/environment';
 import type {
   Permissao,
   OcorrenciaInformacaoDTO,
-  OcorrenciaIntegracaoDto,
-  VitimaChecagemDuplicidadeResquestDto,
   LoginDTO,
   PessoaDTO,
   PagePessoaDTO,
@@ -12,10 +10,9 @@ import type {
   MotivoDto
 } from '@/types/models';
 
-// Configuração do axios
 const api = axios.create({
   baseURL: environment.apiUrl,
-  timeout: 30000, // 30 segundos
+  timeout: 20000,
   headers: {
     'Accept': 'application/json',
   }
@@ -40,7 +37,6 @@ export const buscarInformacoes = async (ocorrenciaId: number): Promise<Ocorrenci
   return res.data;
 };
 
-// Função para adicionar informações sobre pessoa desaparecida
 export const adicionarInformacoes = async (
   informacao: string,
   descricao: string,
@@ -49,22 +45,18 @@ export const adicionarInformacoes = async (
   files?: File[]
 ): Promise<OcorrenciaInformacaoDTO> => {
   try {
-    // Validações básicas
     if (!informacao?.trim()) throw new Error('Informação é obrigatória');
     if (!data) throw new Error('Data é obrigatória');
     if (!ocoId || ocoId <= 0) throw new Error('ID da ocorrência inválido');
     
-    // FormData para arquivos (multipart/form-data)
     const formData = new FormData();
     
-    // Adicionar arquivos se existirem
     if (files && files.length > 0) {
       files.forEach((file) => {
         formData.append('files', file, file.name);
       });
     }
     
-    // Parâmetros da requisição
     const params = {
       informacao: informacao.trim(),
       descricao: descricao?.trim() || '',
@@ -74,7 +66,7 @@ export const adicionarInformacoes = async (
     
     const response = await api.post('/ocorrencias/informacoes-desaparecido', formData, {
       params,
-      timeout: 30000
+      timeout: 20000
     });
     
     return response.data;
@@ -91,62 +83,6 @@ export const adicionarInformacoes = async (
     
     throw error;
   }
-};
-
-export const adicionarOcorrenciaIntegracao = async (data: OcorrenciaIntegracaoDto): Promise<any> => {
-  try {
-    // Validações básicas
-    if (!data.vitima?.nome?.trim()) throw new Error('Nome da vítima é obrigatório');
-    if (!data.comunicante?.nome?.trim()) throw new Error('Nome do comunicante é obrigatório');
-    if (!data.usuarioCadastroId) throw new Error('ID do usuário é obrigatório');
-    if (!data.nomeUsuarioCadastro?.trim()) throw new Error('Nome do usuário é obrigatório');
-    if (!data.cargoUsuarioCadastro?.trim()) throw new Error('Cargo do usuário é obrigatório');
-
-    // Log the data being sent for debugging
-    console.log('Sending data to API:', JSON.stringify(data, null, 2));
-
-    const response = await api.post('/ocorrencias/delegacia-digital', data, {
-      timeout: 30000,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    });
-    
-    return response.data;
-    
-  } catch (error) {
-    console.error('API Error:', error);
-    
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status;
-      const responseData = error.response?.data;
-      
-      console.error('Response status:', status);
-      console.error('Response data:', responseData);
-      console.error('Request config:', error.config);
-      
-      if (status === 400) {
-        const message = responseData?.message || responseData?.error || 'Dados inválidos fornecidos';
-        throw new Error(`Erro 400: ${message}`);
-      }
-      if (status === 401) throw new Error('Erro 401: Acesso não autorizado');
-      if (status === 403) throw new Error('Erro 403: Permissão negada');
-      if (status === 500) {
-        const message = responseData?.message || responseData?.error || 'Erro interno do servidor';
-        throw new Error(`Erro 500: ${message}`);
-      }
-      
-      throw new Error(`Erro ${status}: ${responseData?.message || error.message}`);
-    }
-    
-    throw error;
-  }
-};
-
-export const checarVitimaDuplicada = async (data: VitimaChecagemDuplicidadeResquestDto): Promise<any> => {
-  const res = await api.post('/ocorrencias/delegacia-digital/verificar-duplicidade', data);
-  return res.data;
 };
 
 export const listarMotivosDesaparecimento = async (): Promise<MotivoDto[]> => {

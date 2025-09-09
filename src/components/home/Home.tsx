@@ -31,7 +31,7 @@ export const Home = () => {
         setError(null);
 
         let response: PagePessoaDTO;
-        
+
         const hasFilters = Object.values(searchFilters).some(
           (value) => value !== undefined && value !== "" && value !== null
         );
@@ -93,7 +93,6 @@ export const Home = () => {
 
   return (
     <div className="min-h-screen w-full bg-[#faf9f6] dark:bg-gray-900 relative">
-      {/* Paper Texture */}
       <div
         className="absolute inset-0 z-0"
         style={{
@@ -101,7 +100,6 @@ export const Home = () => {
           backgroundSize: "8px 8px",
         }}
       />
-      {/* Dark mode texture overlay */}
       <div
         className="absolute inset-0 z-0 dark:block hidden"
         style={{
@@ -109,14 +107,10 @@ export const Home = () => {
           backgroundSize: "8px 8px",
         }}
       />
-      {/* Content */}
       <div className="relative z-10">
         <div className="bg-white dark:bg-[#0c0d18] shadow-sm border-b border-gray-200 dark:border-gray-700">
           <div className="container mx-auto px-6 py-6">
-            {/* Estatísticas */}
             <StatisticsCards />
-
-            {/* Filtros de busca */}
             <SearchFiltersComponent
               onFiltersChange={handleFiltersChange}
               loading={loading}
@@ -124,7 +118,6 @@ export const Home = () => {
           </div>
         </div>
 
-        {/* Conteúdo principal */}
         <div className="container mx-auto px-6 py-8">
           {error && (
             <Card className="mb-6 border-red-200 bg-red-50 dark:border-red-800 dark:bg-[#0c0d18]">
@@ -137,7 +130,6 @@ export const Home = () => {
             </Card>
           )}
 
-          {/* Informações dos resultados */}
           {!loading && !error && (
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <div>
@@ -170,10 +162,8 @@ export const Home = () => {
             </div>
           )}
 
-          {/* Grid de cards */}
           {loading ? (
             <div className="space-y-6">
-              {/* Skeleton para informações dos resultados */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 animate-pulse">
                 <div className="space-y-2">
                   <Skeleton variant="shimmer" className="h-7 w-64" />
@@ -182,7 +172,6 @@ export const Home = () => {
                 <Skeleton className="h-5 w-32" />
               </div>
 
-              {/* Grid de cards com skeletons */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
                   <div
@@ -195,7 +184,6 @@ export const Home = () => {
                 ))}
               </div>
 
-              {/* Skeleton da paginação */}
               <div className="flex flex-col lg:flex-row items-center justify-between gap-4 pt-6 animate-pulse">
                 <Skeleton className="h-5 w-48" />
                 <div className="flex items-center gap-2">
@@ -218,7 +206,6 @@ export const Home = () => {
                 ))}
               </div>
 
-              {/* Paginação */}
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}

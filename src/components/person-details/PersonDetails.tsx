@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-// Components
 import { PersonHeader } from "./PersonHeader";
 import { PersonBasicInfo } from "./PersonBasicInfo";
 import { ReportedInformation } from "./ReportedInformation";
@@ -10,11 +9,9 @@ import { ImageModal } from "./ImageModal";
 import { PersonDetailsLoading } from "./PersonDetailsLoading";
 import { PersonNotFound } from "./PersonNotFound";
 
-// Hooks
 import { usePersonDetails } from "@/hooks/usePersonDetails";
 import { useInformationSorting } from "@/hooks/useInformationSorting";
 
-// Services
 import { buscarInformacoes } from "@/services/apiService";
 
 export default function PersonDetails() {
@@ -23,16 +20,15 @@ export default function PersonDetails() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Custom hooks
-  const { sortOrder, toggleSortOrder, sortInformacoesByDate } = useInformationSorting();
+  const { sortOrder, toggleSortOrder, sortInformacoesByDate } =
+    useInformationSorting();
   const { person, informacoes, loading, setInformacoes } = usePersonDetails({
     personId: id,
-    sortInformacoesByDate
+    sortInformacoesByDate,
   });
 
-  // Handlers
   const handleNavigateBack = () => navigate("/");
-  
+
   const handleImageClick = (imageUrl: string | null) => {
     setSelectedImage(imageUrl);
   };
@@ -48,8 +44,7 @@ export default function PersonDetails() {
   const handleInformationSubmit = async () => {
     console.log("Informação enviada");
     setDialogOpen(false);
-    
-    // Recarregar as informações após envio bem-sucedido
+
     if (person?.ultimaOcorrencia?.ocoId) {
       try {
         const infos = await buscarInformacoes(person.ultimaOcorrencia.ocoId);
@@ -61,17 +56,14 @@ export default function PersonDetails() {
     }
   };
 
-  // Loading state
   if (loading) {
     return <PersonDetailsLoading />;
   }
 
-  // Person not found state
   if (!person) {
     return <PersonNotFound onNavigateBack={handleNavigateBack} />;
   }
 
-  // Calculate if person is missing
   const isDesaparecido =
     person.ultimaOcorrencia?.encontradoVivo === undefined ||
     person.ultimaOcorrencia?.encontradoVivo === null ||
@@ -79,7 +71,6 @@ export default function PersonDetails() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative">
-      {/* Paper Texture */}
       <div
         className="absolute inset-0 z-0"
         style={{
@@ -87,7 +78,6 @@ export default function PersonDetails() {
           backgroundSize: "8px 8px",
         }}
       />
-      {/* Dark mode texture overlay */}
       <div
         className="absolute inset-0 z-0 dark:block hidden"
         style={{
@@ -95,9 +85,8 @@ export default function PersonDetails() {
           backgroundSize: "8px 8px",
         }}
       />
-      
+
       <div className="container mx-auto p-6 relative z-10">
-        {/* Header */}
         <PersonHeader
           person={person}
           isDesaparecido={isDesaparecido}
@@ -108,12 +97,8 @@ export default function PersonDetails() {
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch min-h-[50rem]">
-          {/* Main content */}
           <div className="lg:col-span-2 flex flex-col space-y-6">
-            <PersonBasicInfo
-              person={person}
-              onImageClick={handleImageClick}
-            />
+            <PersonBasicInfo person={person} onImageClick={handleImageClick} />
 
             <ReportedInformation
               informacoes={informacoes}
@@ -123,15 +108,10 @@ export default function PersonDetails() {
             />
           </div>
 
-          {/* Sidebar */}
-          <PersonSidebar
-            person={person}
-            onImageClick={handleImageClick}
-          />
+          <PersonSidebar person={person} onImageClick={handleImageClick} />
         </div>
       </div>
 
-      {/* Image Modal */}
       <ImageModal
         selectedImage={selectedImage}
         onClose={() => setSelectedImage(null)}

@@ -1,7 +1,13 @@
 import { ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { PersonInformationForm } from "@/components/person-details/PersonInformationForm";
 import type { PessoaDTO } from "@/types/models";
 
@@ -20,7 +26,7 @@ export function PersonHeader({
   dialogOpen,
   setDialogOpen,
   onNavigateBack,
-  onInformationSubmit
+  onInformationSubmit,
 }: PersonHeaderProps) {
   return (
     <div className="mb-6">
@@ -70,7 +76,9 @@ export function PersonHeader({
           <DialogContent className="max-h-[90vh] overflow-y-auto w-[calc(100vw-2rem)] sm:w-[calc(100vw-3rem)] max-w-2xl">
             <div>
               <DialogHeader className="items-start text-left space-y-1 mb-4">
-                <DialogTitle className="text-left">Fornecer Informação</DialogTitle>
+                <DialogTitle className="text-left">
+                  Fornecer Informação
+                </DialogTitle>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Sobre: <span className="font-medium">{person.nome}</span>
                 </p>

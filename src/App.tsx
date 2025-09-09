@@ -1,4 +1,4 @@
-import { RouterProvider, router } from './routes/routes';
+import { RouterProvider, router } from "./routes/routes";
 
 function App() {
   return <RouterProvider router={router} />;

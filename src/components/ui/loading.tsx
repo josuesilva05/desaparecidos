@@ -1,20 +1,20 @@
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from "lucide-react";
 
 interface LoadingProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   message?: string;
   className?: string;
 }
 
-export const Loading = ({ 
-  size = 'md', 
-  message = 'Carregando...', 
-  className = '' 
+export const Loading = ({
+  size = "md",
+  message = "Carregando...",
+  className = "",
 }: LoadingProps) => {
   const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-6 h-6',
-    lg: 'w-8 h-8'
+    sm: "w-4 h-4",
+    md: "w-6 h-6",
+    lg: "w-8 h-8",
   };
 
   return (

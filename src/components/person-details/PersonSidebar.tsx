@@ -2,7 +2,13 @@ import { Phone, Eye, Download, FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import type { PessoaDTO } from "@/types/models";
 
 interface PersonSidebarProps {
@@ -29,7 +35,6 @@ export function PersonSidebar({ person, onImageClick }: PersonSidebarProps) {
 
   return (
     <div className="flex flex-col gap-6 h-full min-h-[50rem]">
-      {/* Informações do Desaparecimento */}
       {person.ultimaOcorrencia?.ocorrenciaEntrevDesapDTO && (
         <Card className="flex-shrink-0 bg-white dark:bg-[#0c0d18] border border-gray-200 dark:border-gray-700">
           <CardHeader>
@@ -38,13 +43,17 @@ export function PersonSidebar({ person, onImageClick }: PersonSidebarProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {person.ultimaOcorrencia.ocorrenciaEntrevDesapDTO.vestimentasDesaparecido && (
+            {person.ultimaOcorrencia.ocorrenciaEntrevDesapDTO
+              .vestimentasDesaparecido && (
               <div className="mb-4">
                 <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Vestimentas
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  {person.ultimaOcorrencia.ocorrenciaEntrevDesapDTO.vestimentasDesaparecido}
+                  {
+                    person.ultimaOcorrencia.ocorrenciaEntrevDesapDTO
+                      .vestimentasDesaparecido
+                  }
                 </p>
               </div>
             )}
@@ -63,15 +72,11 @@ export function PersonSidebar({ person, onImageClick }: PersonSidebarProps) {
         </Card>
       )}
 
-      {/* Card de contato e cartazes */}
       <Card className="!gap-3 flex-1 flex flex-col bg-white dark:bg-[#0c0d18] border border-gray-200 dark:border-gray-700">
         <CardHeader className="flex-shrink-0">
-          <CardTitle className="text-lg">
-            Informações de Emergência
-          </CardTitle>
+          <CardTitle className="text-lg">Informações de Emergência</CardTitle>
         </CardHeader>
         <CardContent className="flex-1 flex flex-col space-y-4">
-          {/* Seção de contato no topo do card */}
           <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg flex-shrink-0 border border-red-200 dark:border-red-800/30">
             <h4 className="font-semibold text-red-800 dark:text-red-200 mb-2">
               Viu esta pessoa?
@@ -89,7 +94,6 @@ export function PersonSidebar({ person, onImageClick }: PersonSidebarProps) {
             </div>
           </div>
 
-          {/* Seção principal com cartazes */}
           <div className="flex-1 space-y-4">
             <PosterSection
               person={person}
@@ -111,8 +115,15 @@ interface PosterSectionProps {
   getFileNameFromUrl: (url: string) => string;
 }
 
-function PosterSection({ person, onImageClick, downloadFile, getFileNameFromUrl }: PosterSectionProps) {
-  const hasPosters = person.ultimaOcorrencia?.listaCartaz && person.ultimaOcorrencia.listaCartaz.length > 0;
+function PosterSection({
+  person,
+  onImageClick,
+  downloadFile,
+  getFileNameFromUrl,
+}: PosterSectionProps) {
+  const hasPosters =
+    person.ultimaOcorrencia?.listaCartaz &&
+    person.ultimaOcorrencia.listaCartaz.length > 0;
 
   if (hasPosters) {
     return (
@@ -176,7 +187,9 @@ function PosterSection({ person, onImageClick, downloadFile, getFileNameFromUrl 
                   onClick={() =>
                     downloadFile(
                       cartaz.urlCartaz!,
-                      `cartaz_${index + 1}_${getFileNameFromUrl(cartaz.urlCartaz!)}`
+                      `cartaz_${index + 1}_${getFileNameFromUrl(
+                        cartaz.urlCartaz!
+                      )}`
                     )
                   }
                 >

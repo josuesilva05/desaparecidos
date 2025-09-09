@@ -23,7 +23,6 @@ export function AlertProvider({ children }: { children: ReactNode }) {
     const id = Date.now().toString();
     setAlerts(prev => [...prev, { id, type, message }]);
     
-    // Auto remove after 5 seconds
     setTimeout(() => {
       removeAlert(id);
     }, 5000);
@@ -40,7 +39,6 @@ export function AlertProvider({ children }: { children: ReactNode }) {
     <AlertContext.Provider value={{ success, error }}>
       {children}
       
-      {/* Alert Container */}
       <div className="fixed top-4 right-4 z-[9999] space-y-2 max-w-md">
         {alerts.map(alert => (
           <Alert

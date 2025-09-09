@@ -2,12 +2,17 @@ import { AlertCircle, ArrowDown, ArrowUp, FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { OcorrenciaInformacaoDTO } from "@/types/models";
 
 interface ReportedInformationProps {
   informacoes: OcorrenciaInformacaoDTO[];
-  sortOrder: 'asc' | 'desc';
+  sortOrder: "asc" | "desc";
   onToggleSortOrder: () => void;
   onImageClick: (imageUrl: string) => void;
 }
@@ -16,7 +21,7 @@ export function ReportedInformation({
   informacoes,
   sortOrder,
   onToggleSortOrder,
-  onImageClick
+  onImageClick,
 }: ReportedInformationProps) {
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
@@ -41,17 +46,23 @@ export function ReportedInformation({
                   size="sm"
                   onClick={onToggleSortOrder}
                   className="h-8 px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-1"
-                  title={`Ordenar por data ${sortOrder === 'desc' ? 'crescente' : 'decrescente'}`}
+                  title={`Ordenar por data ${
+                    sortOrder === "desc" ? "crescente" : "decrescente"
+                  }`}
                 >
-                  {sortOrder === 'desc' ? (
+                  {sortOrder === "desc" ? (
                     <>
                       <ArrowDown className="h-3 w-3 text-gray-600 dark:text-gray-400" />
-                      <span className="text-xs text-gray-600 dark:text-gray-400">Recente</span>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                        Recente
+                      </span>
                     </>
                   ) : (
                     <>
                       <ArrowUp className="h-3 w-3 text-gray-600 dark:text-gray-400" />
-                      <span className="text-xs text-gray-600 dark:text-gray-400">Antiga</span>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                        Antiga
+                      </span>
                     </>
                   )}
                 </Button>
@@ -59,7 +70,10 @@ export function ReportedInformation({
             )}
           </div>
           {informacoes.length > 0 && (
-            <Badge variant="secondary" className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600">
+            <Badge
+              variant="secondary"
+              className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600"
+            >
               {informacoes.length}{" "}
               {informacoes.length === 1 ? "registro" : "registros"}
             </Badge>
@@ -104,10 +118,14 @@ interface InformationItemProps {
   isImageUrl: (url: string) => boolean;
 }
 
-function InformationItem({ info, onImageClick, formatDate, isImageUrl }: InformationItemProps) {
+function InformationItem({
+  info,
+  onImageClick,
+  formatDate,
+  isImageUrl,
+}: InformationItemProps) {
   return (
     <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-      {/* Cabeçalho da informação */}
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center gap-2">
           <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -117,14 +135,12 @@ function InformationItem({ info, onImageClick, formatDate, isImageUrl }: Informa
         </div>
       </div>
 
-      {/* Texto da informação */}
       <div className="mb-3">
         <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed bg-white dark:bg-gray-900 p-3 rounded border border-gray-200 dark:border-gray-600">
           {info.informacao}
         </p>
       </div>
 
-      {/* Anexos em quadradinhos */}
       {info.anexos && info.anexos.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
@@ -168,7 +184,7 @@ function AttachmentGridItem({
   info,
   onImageClick,
   formatDate,
-  isImageUrl
+  isImageUrl,
 }: AttachmentGridItemProps) {
   return (
     <div className="group relative attachment-grid-item">
@@ -190,15 +206,12 @@ function AttachmentGridItem({
         )}
       </div>
 
-      {/* Botões de ação - aparecem no hover */}
       <div className="absolute -bottom-8 left-0 right-0 opacity-0 group-hover:opacity-100 action-buttons">
         <div className="flex gap-1 bg-white dark:bg-gray-800 rounded shadow-lg p-1 border border-gray-200 dark:border-gray-600">
           <Dialog>
             <DialogContent className="max-w-4xl max-h-[90vh]">
               <DialogHeader>
-                <DialogTitle>
-                  Anexo - {formatDate(info.data)}
-                </DialogTitle>
+                <DialogTitle>Anexo - {formatDate(info.data)}</DialogTitle>
               </DialogHeader>
               <div className="flex justify-center">
                 {isImageUrl(anexo) ? (
@@ -213,9 +226,7 @@ function AttachmentGridItem({
                     <p className="text-gray-600 dark:text-gray-400 mb-4">
                       Arquivo não é uma imagem
                     </p>
-                    <Button
-                      onClick={() => window.open(anexo, "_blank")}
-                    >
+                    <Button onClick={() => window.open(anexo, "_blank")}>
                       Abrir arquivo
                     </Button>
                   </div>

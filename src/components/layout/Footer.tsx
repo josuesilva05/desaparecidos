@@ -1,5 +1,5 @@
-import React from 'react';
-import { Heart } from 'lucide-react';
+import React from "react";
+import { Heart } from "lucide-react";
 
 export const Footer: React.FC = () => {
   return (
@@ -9,13 +9,13 @@ export const Footer: React.FC = () => {
           <div className="flex items-center justify-center gap-2 mb-4">
             <Heart className="h-5 w-5 text-red-500" />
             <span className="text-gray-600 dark:text-gray-400">
-              Sistema desenvolvido para ajudar famílias a encontrarem seus
-              entes queridos
+              Sistema desenvolvido para ajudar famílias a encontrarem seus entes
+              queridos
             </span>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Se você tem informações sobre alguma pessoa desaparecida, entre
-            em contato: <strong>(65) 3901-4839 (1ª DP - CENTRO DE CUIABÁ)</strong>
+            Se você tem informações sobre alguma pessoa desaparecida, entre em
+            contato: <strong>(65) 3901-4839 (1ª DP - CENTRO DE CUIABÁ)</strong>
           </p>
         </div>
       </div>

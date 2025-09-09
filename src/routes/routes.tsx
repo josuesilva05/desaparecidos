@@ -1,11 +1,15 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { lazy } from 'react';
-import { Layout } from '@/components/layout/Layout';
-import { AlertProvider } from '@/hooks/useAlert';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { lazy } from "react";
+import { Layout } from "@/components/layout/Layout";
+import { AlertProvider } from "@/hooks/useAlert";
 
-const Home = lazy(() => import('../components/home/Home').then(module => ({ default: module.Home })));
-const PersonDetails = lazy(() => import('../components/person-details/PersonDetails'));
-const NotFound = lazy(() => import('../components/error/NotFound'));
+const Home = lazy(() =>
+  import("../components/home/Home").then((module) => ({ default: module.Home }))
+);
+const PersonDetails = lazy(
+  () => import("../components/person-details/PersonDetails")
+);
+const NotFound = lazy(() => import("../components/error/NotFound"));
 
 const router = createBrowserRouter([
   {
@@ -13,7 +17,7 @@ const router = createBrowserRouter([
     element: (
       <AlertProvider>
         <Layout>
-            <Home />
+          <Home />
         </Layout>
       </AlertProvider>
     ),
@@ -23,7 +27,7 @@ const router = createBrowserRouter([
     element: (
       <AlertProvider>
         <Layout>
-            <PersonDetails />
+          <PersonDetails />
         </Layout>
       </AlertProvider>
     ),
@@ -33,7 +37,7 @@ const router = createBrowserRouter([
     element: (
       <AlertProvider>
         <Layout>
-            <NotFound />
+          <NotFound />
         </Layout>
       </AlertProvider>
     ),

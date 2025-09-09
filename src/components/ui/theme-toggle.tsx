@@ -7,7 +7,6 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
-  // useEffect apenas roda no lado do cliente, evitando hydration mismatch
   useEffect(() => {
     setMounted(true)
   }, [])
